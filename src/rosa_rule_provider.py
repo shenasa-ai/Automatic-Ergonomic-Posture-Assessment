@@ -160,6 +160,25 @@ class RosaRuleProvider:
         if r_wrist_l_wrist_angle and (r_wrist_l_wrist_angle < 160 or r_wrist_l_wrist_angle > 220):
             mouse_score += 2
 
+        # neck rule side
+        r_hip_shoulder_ear_angle = self.get_r_hip_shoulder_ear_angle(points)
+        l_hip_shoulder_ear_angle = self.get_l_hip_shoulder_ear_angle(points)
+
+        r_ear_eye_shoulder_angle = self.get_r_ear_eye_shoulder_angle(points)
+        l_ear_eye_shoulder_angle = self.get_l_ear_eye_shoulder_angle(points)
+
+        # neck rule front
+        if points[PoseDetector.LEye] and points[PoseDetector.LEye] and points[PoseDetector.LShoulder] \
+                and points[PoseDetector.RShoulder]:
+            v1 = np.array(points[PoseDetector.LEye]) - np.array(points[PoseDetector.REye])
+            v2 = np.array(points[PoseDetector.LShoulder]) - np.array(points[PoseDetector.RShoulder])
+            angle_between_shoulders_and_eyes = self.get_angle_between_lines(v1, v2)
+
+        # neck rule twist side
+        neck_twisted_status_from_side = self.is_neck_twisted_from_side(points)
+
+        # neck rule twist front
+
         print(f'chair score is: {chair_score}\n'
               f'armrest score is: {armrest_score}\n'
               f'backrest score is: {backrest_score}\n'
@@ -264,6 +283,88 @@ class RosaRuleProvider:
         angle = self.get_angle_between_points(points[PoseDetector.LShoulder],
                                               points[PoseDetector.LElbow], points[PoseDetector.LWrist])
         print(f'left shoulder_elbow_wrist angle: {angle}')
+        return angle
+
+    # neck rules
+    def is_neck_twisted_from_side(self, points):
+        if points[PoseDetector.RShoulder] and points[PoseDetector.LShoulder]:
+            if points[PoseDetector.REar] and points[PoseDetector.LEar] and points[PoseDetector.Nose]:
+                return 0
+            else:
+                return 1
+
+        elif points[PoseDetector.RShoulder] and points[PoseDetector.LShoulder] is None:
+            if points[PoseDetector.REar] and points[PoseDetector.LEar] is None:
+                return 0
+            else:
+                return 1
+
+        elif points[PoseDetector.RShoulder] is None and points[PoseDetector.LShoulder]:
+            if points[PoseDetector.REar] is None and points[PoseDetector.LEar]:
+                return 0
+            else:
+                return 1
+
+    def neck_rule_twist_side_front(self, points):
+        if points[PoseDetector.REar] and points[PoseDetector.LEar] and points[PoseDetector.Nose]:
+            return 0
+
+        elif points[PoseDetector.REye] and points[PoseDetector.LEye] and points[PoseDetector.Nose]:
+            r_ear_nose_distance = self.calculate_distance_between_two_points(points[PoseDetector.REye],
+                                                                             points[PoseDetector.Nose])
+            l_ear_nose_distance = self.calculate_distance_between_two_points(points[PoseDetector.LEye],
+                                                                             points[PoseDetector.Nose])
+            ratio = r_ear_nose_distance / l_ear_nose_distance
+            if ratio < 1:
+                if ratio < 0.8:
+                    print(f'{ratio} < 0.8')
+                    print(f'twisted')
+                    return 1
+                else:
+                    print(f'{ratio} > 0.8')
+                    print(f'not twisted')
+
+            else:
+                if ratio > 1.25:
+                    print(f' {ratio} > 1.25')
+                    print(f' twisted')
+                else:
+                    print(f'{ratio} < 1.25')
+                    print(f'not twisted')
+            #     return 0
+            # else:
+            #     plt.text(100, 200, f'r = {ratio} < 0.8', size=15)
+
+        elif (points[PoseDetector.REye] or points[PoseDetector.LEye]) and (points[PoseDetector.Nose]):
+            print('only one eye is seen')
+            return 1
+
+    def get_r_hip_shoulder_ear_angle(self, points):
+        # r_hip_shoulder_ear_pairs = [[8, 2], [2, 16]]
+        angle = self.get_angle_between_points(points[PoseDetector.RHip],
+                                              points[PoseDetector.RShoulder], points[PoseDetector.REar])
+        print(f'right hip_shoulder_ear angle: {angle}')
+        return angle
+
+    def get_l_hip_shoulder_ear_angle(self, points):
+        # l_hip_shoulder_ear_pairs = [[11, 5], [5, 17]]
+        angle = self.get_angle_between_points(points[PoseDetector.LHip],
+                                              points[PoseDetector.LShoulder], points[PoseDetector.LEar])
+        print(f'left hip_shoulder_ear angle: {angle}')
+        return angle
+
+    def get_r_ear_eye_shoulder_angle(self, points):
+        # l_ear_eye_shoulder_pairs = [[16, 14], [14, 2]]
+        angle = self.get_angle_between_points(points[PoseDetector.REye],
+                                              points[PoseDetector.REar], points[PoseDetector.RShoulder])
+        print(f'right ear_eye_shoulder angle: {angle}')
+        return angle
+
+    def get_l_ear_eye_shoulder_angle(self, points):
+        # l_ear_eye_shoulder_pairs = [[17, 15], [15, 5]]
+        angle = self.get_angle_between_points(points[PoseDetector.LEye],
+                                              points[PoseDetector.LEar], points[PoseDetector.LShoulder])
+        print(f'left ear_eye_shoulder angle: {angle}')
         return angle
 
     def get_angle_between_lines(self, v1, v2):
