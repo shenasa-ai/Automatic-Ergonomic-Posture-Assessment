@@ -1,61 +1,52 @@
 import argparse
 import os
-import glob
-
 import cv2
 from src.pose_detector import PoseDetector
+from src.open_pose_detector import OpenPoseDetector
+from src.mediapipe_pose_detector import MediapipePoseDetector
+from src.openpifpaf_pose_detector import OpenpifpafPoseDetector
 from src.rosa_rule_provider import RosaRuleProvider
 
+deep_model = "openpose"
+
 parser = argparse.ArgumentParser()
-parser.add_argument('--path', default='../input/test.mov', help='path to input file')
-parser.add_argument('--save_path', default='../output', help='path to save output')
+parser.add_argument('--input_path', default='../input', help='path to input directory')
+parser.add_argument('--output_path', default=f'../output/{deep_model}', help='path to output directory')
 parser.add_argument('--frame_rate', default=10, help='video frame rate')
 
 args = parser.parse_args()
 
 
+def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provider):
+    for file in os.listdir(root_dir):
+        file_name = os.fsdecode(file)
+        image = cv2.imread(f'{root_dir}/{file_name}')
+        resized_image = pose_detector.preprocess_image(image)
+        points = pose_detector.get_joint_points()
+        position_status = rosa_rule_provider.get_posture_status(resized_image, points, file_name, camera_view_point)
+        rosa_rule_provider.save_image(position_status, args.output_path, file_name)
+        print('*******************************************************************************************')
+
+
 def main():
-    os.makedirs(args.save_path, exist_ok=True)
-    pose_detector = PoseDetector()
+    os.makedirs(args.output_path, exist_ok=True)
 
-    # image
-    img_name = '2'
-    image = cv2.imread(f'../input/{img_name}.jpg')
-    resized_image, dim = pose_detector.resize(image)
-    output = pose_detector.forward_model()
-    points = pose_detector.get_joint_points(output)
-    rosa_rule_provider = RosaRuleProvider(resized_image)
-    rosa_rule_provider.display_joint_points(points)
-    position_status = rosa_rule_provider.is_correct_position(points, img_name)
-    rosa_rule_provider.save_image(img_name, position_status)
-
-    # # video
-    # cap = cv2.VideoCapture(args.path)
-    # counter = -1
-    # while cap.isOpened():
-    #     counter += 1
-    #     ret, frame = cap.read()
-    #     if ret:
-    #         if counter % args.frame_rate == 0:
-    #             output = pose_detector.forward_model(frame)
-    #             points = pose_detector.get_joint_points(output)
-    #             pose_detector.draw_skeleton(points, counter)
-    #             pose_detector.is_correct(points, counter)
-    #     else:
-    #         cap.release()
-    #         cv2.destroyAllWindows()
-    #         img_array = []
-    #         for filename in sorted(glob.glob(os.path.join(args.save_path, '*.png'))):
-    #             img = cv2.imread(filename)
-    #             height, width, layers = img.shape
-    #             size = (width, height)
-    #             img_array.append(img)
-    #
-    #         out = cv2.VideoWriter('results.avi', cv2.VideoWriter_fourcc(*'DIVX'), 3, size)
-    #
-    #         for i in range(len(img_array)):
-    #             out.write(img_array[i])
-    #         out.release()
+    input_directory = os.fsencode(args.input_path).decode("utf-8")
+    pose_detector = None
+    if deep_model == "openpose":
+        pose_detector = OpenPoseDetector()
+    elif deep_model == "Openpifpaf":
+        pose_detector = OpenpifpafPoseDetector()
+    elif deep_model == "Mediapipe":
+        pose_detector = MediapipePoseDetector()
+    rosa_rule_provider = RosaRuleProvider(pose_detector)
+    os.remove(f'{args.output_path}/log.txt')
+    sub_dirs = [x[0] for x in os.walk(input_directory)]
+    for subdir in sub_dirs:
+        if 'side' in subdir:
+            assess_posture(subdir, 'side', pose_detector, rosa_rule_provider)
+        elif 'front' in subdir:
+            assess_posture(subdir, 'front', pose_detector, rosa_rule_provider)
 
 
 if __name__ == '__main__':

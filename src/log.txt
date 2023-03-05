@@ -1,0 +1,11 @@
+Description of 1.jpg:
+Right knee status is correct
+Right hip_knee_ankle angle: 93.36577066591477
+Left knee status is correct
+Left hip_knee_ankle angle: 82.12629226903675
+Back rest is normal from right side
+Right shoulder_hip_knee angle: 106.27333543007721
+Back rest is bent forward from left side
+Left shoulder_hip_knee angle: 93.81815126997911
+Neck is normal from left side view 
+Left hip_shoulder_ear angle: 149.0548543961573 
