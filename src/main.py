@@ -40,7 +40,8 @@ def main():
     elif deep_model == "Mediapipe":
         pose_detector = MediapipePoseDetector()
     rosa_rule_provider = RosaRuleProvider(pose_detector)
-    os.remove(f'{args.output_path}/log.txt')
+    if os.path.exists(f'{args.output_path}/log.txt'):
+        os.remove(f'{args.output_path}/log.txt')
     sub_dirs = [x[0] for x in os.walk(input_directory)]
     for subdir in sub_dirs:
         if 'side' in subdir:

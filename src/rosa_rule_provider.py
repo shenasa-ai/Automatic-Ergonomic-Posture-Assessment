@@ -13,7 +13,7 @@ class RosaRuleProvider:
         self.circle_radius = 3
         self.line_thickness = 2
         self.description = ""
-        self.incorrect_pairs = []
+        self.repetitive_pairs = []
         self.camera_view_point = "front"
 
     def get_posture_status(self, image, points, file_name, view_point, draw_joint_points=True):
@@ -486,11 +486,25 @@ class RosaRuleProvider:
             part_b = pair[1]
 
             if points[part_a] and points[part_b]:
-                if is_correct_edge and pair not in self.incorrect_pairs:
-                    cv2.line(self.image, points[part_a], points[part_b], (0, 255, 255), self.line_thickness)
+                if pair in self.repetitive_pairs:
+                    updated_point_a1 = points[part_a][0] + 5
+                    updated_point_a2 = points[part_a][1] + 5
+                    updated_point_b1 = points[part_b][0] + 5
+                    updated_point_b2 = points[part_b][1] + 5
+                    if is_correct_edge:
+                        cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2), (0, 255, 255),
+                                 self.line_thickness)
+                    else:
+                        cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2), (0, 0, 255),
+                                 self.line_thickness)
+                        self.repetitive_pairs.append(pair)
                 else:
-                    cv2.line(self.image, points[part_a], points[part_b], (0, 0, 255), self.line_thickness)
-                    self.incorrect_pairs.append(pair)
+                    if is_correct_edge:
+                        cv2.line(self.image, points[part_a], points[part_b], (0, 255, 255), self.line_thickness)
+                    else:
+                        cv2.line(self.image, points[part_a], points[part_b], (0, 0, 255), self.line_thickness)
+                        self.repetitive_pairs.append(pair)
+                    self.repetitive_pairs.append(pair)
 
     def save_image(self, is_correct_posture, output_directory, file_name):
         img_copy = self.image.copy()
