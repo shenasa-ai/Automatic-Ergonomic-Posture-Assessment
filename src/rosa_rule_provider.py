@@ -1,7 +1,7 @@
 import math
 import os
 import numpy as np
-from src.pose_detector import PoseDetector
+from pose_detector import PoseDetector
 from matplotlib import pyplot as plt
 import cv2
 
@@ -67,6 +67,7 @@ class RosaRuleProvider:
         chair_score = 1
 
         if self.camera_view_point == "side":
+            import pudb; pu.db
             r_hip_knee_ankle_angle = self.get_r_hip_knee_ankle_angle(points)
             l_hip_knee_ankle_angle = self.get_l_hip_knee_ankle_angle(points)
             r_hip_knee_ankle_points = [[self.pose_detector.RHip, self.pose_detector.RKnee],
@@ -522,7 +523,11 @@ class RosaRuleProvider:
         if p1 and p2 and p3:
             v1, v2 = self.get_vectors_between_points(p2, p1, p2, p3)
             angle = self.get_angle_between_lines(v1, v2)
-            return round(angle, 2)
+            import pudb; pu.db
+            if angle is None:
+                return None
+            else:
+                return round(angle, 2)
         else:
             return None
 

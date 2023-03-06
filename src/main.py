@@ -1,13 +1,13 @@
 import argparse
 import os
 import cv2
-from src.pose_detector import PoseDetector
-from src.open_pose_detector import OpenPoseDetector
-from src.mediapipe_pose_detector import MediapipePoseDetector
-from src.openpifpaf_pose_detector import OpenpifpafPoseDetector
-from src.rosa_rule_provider import RosaRuleProvider
+from pose_detector import PoseDetector
+from open_pose_detector import OpenPoseDetector
+from mediapipe_pose_detector import MediapipePoseDetector
+from openpifpaf_pose_detector import OpenpifpafPoseDetector
+from rosa_rule_provider import RosaRuleProvider
 
-deep_model = "openpose"
+deep_model = "Openpifpaf"  #"openpose" 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_path', default='../input', help='path to input directory')
@@ -36,6 +36,7 @@ def main():
     if deep_model == "openpose":
         pose_detector = OpenPoseDetector()
     elif deep_model == "Openpifpaf":
+        import pudb; pu.db
         pose_detector = OpenpifpafPoseDetector()
     elif deep_model == "Mediapipe":
         pose_detector = MediapipePoseDetector()
@@ -51,4 +52,5 @@ def main():
 
 
 if __name__ == '__main__':
+    import pudb; pu.db
     main()
