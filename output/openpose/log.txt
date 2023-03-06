@@ -1,340 +1,370 @@
 Description of 9.jpg:
 f"*************************************************************************
 Description of 73.jpg:
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 115.87
-Back rest is bent backward from left side - left shoulder_hip_knee angle: 119.87
-Neck is bent forward from right side view - right hip_shoulder_ear angle: 136.5
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 115.87
+Back rest is BENT BACKWARD from left side - left shoulder_hip_knee angle: 119.87
+Neck is BENT FORWARD from right side view - right hip_shoulder_ear angle: 136.5
 f"*************************************************************************
 Description of 49.jpg:
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 120.19
-Back rest is bent backward from left side - left shoulder_hip_knee angle: 112.53
-Neck is normal from left side view - left hip_shoulder_ear angle: 171.12 
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 120.19
+Back rest is BENT BACKWARD from left side - left shoulder_hip_knee angle: 112.53
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 171.12 
 f"*************************************************************************
 Description of 70.jpg:
-Neck is bent forward from right side view - right hip_shoulder_ear angle: 137.12
+Neck is BENT FORWARD from right side view - right hip_shoulder_ear angle: 137.12
 f"*************************************************************************
 Description of 54.jpg:
 f"*************************************************************************
 Description of 23.jpg:
-Right knee status is in correct posture - right hip_knee_ankle angle: 98.22
-Back rest is normal from right side - right shoulder_hip_knee angle: 98.22
-Neck is normal from right side view - right hip_shoulder_ear angle: 142.43
+Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: 98.22
+Back rest is NORMAL from right side - right shoulder_hip_knee angle: 98.22
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 142.43
 f"*************************************************************************
 Description of 15.jpg:
-Chair is too high - right hip_knee_ankle angle: 109.9
-Back rest is bent forward from right side - right shoulder_hip_knee angle: 79.73
-Back rest is bent forward from left side - left shoulder_hip_knee angle: 77.84
-Neck is normal from right side view - right hip_shoulder_ear angle: 148.79
+Chair is TOO HIGH - right hip_knee_ankle angle: 109.9
+Back rest is BENT FORWARD from right side - right shoulder_hip_knee angle: 79.73
+Back rest is BENT FORWARD from left side - left shoulder_hip_knee angle: 77.84
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 148.79
 f"*************************************************************************
 Description of 39.jpg:
-Neck is normal from left side view - left hip_shoulder_ear angle: 168.36 
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 168.36 
 f"*************************************************************************
 Description of 25.jpg:
-Chair is too high - left hip_knee_ankle angle: 103.6
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 124.21
-Back rest is normal from left side - left shoulder_hip_knee angle: 109.86
-Neck is normal from left side view - left hip_shoulder_ear angle: 155.06 
+Chair is TOO HIGH - left hip_knee_ankle angle: 103.6
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 124.21
+Back rest is NORMAL from left side - left shoulder_hip_knee angle: 109.86
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 155.06 
 f"*************************************************************************
 Description of 32.jpg:
-Back rest is bent forward from left side - left shoulder_hip_knee angle: 55.82
-Neck is normal from left side view - left hip_shoulder_ear angle: 148.24 
+Back rest is BENT FORWARD from left side - left shoulder_hip_knee angle: 55.82
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 148.24 
+Neck is BENT UPWARD from side view - left ear_eye_shoulder angle: 147.91 
 f"*************************************************************************
 Description of 20.jpg:
 f"*************************************************************************
 Description of 60.jpg:
-Neck is normal from left side view - left hip_shoulder_ear angle: 158.44 
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 158.44 
 f"*************************************************************************
 Description of 29.jpg:
-Back rest is bent forward from left side - left shoulder_hip_knee angle: 90.31
-Neck is bent forward from right side view - right hip_shoulder_ear angle: 118.41
+Back rest is BENT FORWARD from left side - left shoulder_hip_knee angle: 90.31
+Neck is BENT FORWARD from right side view - right hip_shoulder_ear angle: 118.41
+Neck is BENT UPWARD from side view - right ear_eye_shoulder angle: 136.89 
 f"*************************************************************************
 Description of 42.jpg:
-Chair is too low - right hip_knee_ankle angle: 78.92
-Chair is too high - left hip_knee_ankle angle: 122.64
-Back rest is normal from right side - right shoulder_hip_knee angle: 106.46
-Back rest is normal from left side - left shoulder_hip_knee angle: 103.48
-Neck is normal from right side view - right hip_shoulder_ear angle: 159.72
+Chair is TOO LOW - right hip_knee_ankle angle: 78.92
+Chair is TOO HIGH - left hip_knee_ankle angle: 122.64
+Back rest is NORMAL from right side - right shoulder_hip_knee angle: 106.46
+Back rest is NORMAL from left side - left shoulder_hip_knee angle: 103.48
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 159.72
 f"*************************************************************************
 Description of 12.jpg:
-Back rest is normal from left side - left shoulder_hip_knee angle: 99.54
-Neck is normal from left side view - left hip_shoulder_ear angle: 167.54 
+Back rest is NORMAL from left side - left shoulder_hip_knee angle: 99.54
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 167.54 
+Neck is BENT UPWARD from side view - left ear_eye_shoulder angle: 126.61 
 f"*************************************************************************
 Description of 38.jpg:
-Chair is too high - right hip_knee_ankle angle: 122.05
-Chair is too high - left hip_knee_ankle angle: 112.14
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 126.61
-Back rest is normal from left side - left shoulder_hip_knee angle: 102.1
-Neck is normal from right side view - right hip_shoulder_ear angle: 154.09
+Chair is TOO HIGH - right hip_knee_ankle angle: 122.05
+Chair is TOO HIGH - left hip_knee_ankle angle: 112.14
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 126.61
+Back rest is NORMAL from left side - left shoulder_hip_knee angle: 102.1
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 154.09
+Neck is BENT UPWARD from side view - right ear_eye_shoulder angle: 134.34 
 f"*************************************************************************
 Description of 24.jpg:
-Right knee status is in correct posture - right hip_knee_ankle angle: 82.74
-Chair is too high - left hip_knee_ankle angle: 107.01
-Back rest is normal from right side - right shoulder_hip_knee angle: 102.44
-Back rest is normal from left side - left shoulder_hip_knee angle: 97.66
-Neck is normal from right side view - right hip_shoulder_ear angle: 143.98
+Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: 82.74
+Chair is TOO HIGH - left hip_knee_ankle angle: 107.01
+Back rest is NORMAL from right side - right shoulder_hip_knee angle: 102.44
+Back rest is NORMAL from left side - left shoulder_hip_knee angle: 97.66
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 143.98
+Neck is BENT UPWARD from side view - right ear_eye_shoulder angle: 133.88 
 f"*************************************************************************
 Description of 26.jpg:
-Chair is too high - left hip_knee_ankle angle: 106.28
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 112.15
-Back rest is bent backward from left side - left shoulder_hip_knee angle: 111.84
-Neck is normal from left side view - left hip_shoulder_ear angle: 160.4 
+Chair is TOO HIGH - left hip_knee_ankle angle: 106.28
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 112.15
+Back rest is BENT BACKWARD from left side - left shoulder_hip_knee angle: 111.84
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 160.4 
 f"*************************************************************************
 Description of 4.jpg:
-Neck is normal from left side view - left hip_shoulder_ear angle: 150.83 
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 150.83 
 f"*************************************************************************
 Description of 57.jpg:
-Back rest is normal from right side - right shoulder_hip_knee angle: 107.78
-Neck is normal from right side view - right hip_shoulder_ear angle: 180.0
+Back rest is NORMAL from right side - right shoulder_hip_knee angle: 107.78
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 180.0
 f"*************************************************************************
 Description of 66.jpg:
-Neck is bent forward from right side view - right hip_shoulder_ear angle: 124.76
+Neck is BENT FORWARD from right side view - right hip_shoulder_ear angle: 124.76
+Neck is BENT UPWARD from side view - right ear_eye_shoulder angle: 177.65 
 f"*************************************************************************
 Description of 19.jpg:
-Chair is too high - right hip_knee_ankle angle: 107.94
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 126.83
-Back rest is bent backward from left side - left shoulder_hip_knee angle: 119.69
-Neck is bent forward from right side view - right hip_shoulder_ear angle: 134.55
+Chair is TOO HIGH - right hip_knee_ankle angle: 107.94
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 126.83
+Back rest is BENT BACKWARD from left side - left shoulder_hip_knee angle: 119.69
+Neck is BENT FORWARD from right side view - right hip_shoulder_ear angle: 134.55
 f"*************************************************************************
 Description of 46.jpg:
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 118.03
-Neck is normal from right side view - right hip_shoulder_ear angle: 152.81
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 118.03
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 152.81
 f"*************************************************************************
 Description of 21.jpg:
-Neck is normal from left side view - left hip_shoulder_ear angle: 144.03 
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 144.03 
 f"*************************************************************************
 Description of 28.jpg:
-Neck is bent forward from right side view - right hip_shoulder_ear angle: 134.45
+Neck is BENT FORWARD from right side view - right hip_shoulder_ear angle: 134.45
+Neck is BENT UPWARD from side view - right ear_eye_shoulder angle: 154.64 
 f"*************************************************************************
 Description of 17.jpg:
-Right knee status is in correct posture - right hip_knee_ankle angle: 83.42
-Chair is too low - left hip_knee_ankle angle: 63.87
-Back rest is bent forward from right side - right shoulder_hip_knee angle: 82.15
-Back rest is bent forward from left side - left shoulder_hip_knee angle: 85.44
-Neck is normal from left side view - left hip_shoulder_ear angle: 165.78 
+Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: 83.42
+Chair is TOO LOW - left hip_knee_ankle angle: 63.87
+Back rest is BENT FORWARD from right side - right shoulder_hip_knee angle: 82.15
+Back rest is BENT FORWARD from left side - left shoulder_hip_knee angle: 85.44
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 165.78 
 f"*************************************************************************
 Description of 5.jpg:
-Neck is normal from left side view - left hip_shoulder_ear angle: 155.75 
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 155.75 
 f"*************************************************************************
 Description of 55.jpg:
-Back rest is bent forward from right side - right shoulder_hip_knee angle: 76.03
-Back rest is normal from left side - left shoulder_hip_knee angle: 100.59
-Neck is bent forward from right side view - right hip_shoulder_ear angle: 89.71
+Back rest is BENT FORWARD from right side - right shoulder_hip_knee angle: 76.03
+Back rest is NORMAL from left side - left shoulder_hip_knee angle: 100.59
+Neck is BENT FORWARD from right side view - right hip_shoulder_ear angle: 89.71
 f"*************************************************************************
 Description of 68.jpg:
-Neck is bent forward from left side view - left hip_shoulder_ear angle: 127.86 
+Neck is BENT FORWARD from left side view - left hip_shoulder_ear angle: 127.86 
+Neck is BENT UPWARD from side view - left ear_eye_shoulder angle: 132.36 
 f"*************************************************************************
 Description of 62.jpg:
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 110.25
-Back rest is bent backward from left side - left shoulder_hip_knee angle: 154.43
-Neck is bent forward from right side view - right hip_shoulder_ear angle: 138.56
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 110.25
+Back rest is BENT BACKWARD from left side - left shoulder_hip_knee angle: 154.43
+Neck is BENT FORWARD from right side view - right hip_shoulder_ear angle: 138.56
 f"*************************************************************************
 Description of 45.jpg:
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 112.14
-Neck is normal from right side view - right hip_shoulder_ear angle: 146.75
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 112.14
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 146.75
 f"*************************************************************************
 Description of 65.jpg:
 f"*************************************************************************
 Description of 31.jpg:
-Neck is normal from right side view - right hip_shoulder_ear angle: 150.88
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 150.88
 f"*************************************************************************
 Description of 2.jpg:
-Back rest is normal from right side - right shoulder_hip_knee angle: 103.3
-Neck is normal from right side view - right hip_shoulder_ear angle: 173.44
+Back rest is NORMAL from right side - right shoulder_hip_knee angle: 103.3
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 173.44
 f"*************************************************************************
 Description of 13.jpg:
-Chair is too low - right hip_knee_ankle angle: 65.43
-Left knee status is in correct posture - left hip_knee_ankle angle: 84.08
-Back rest is bent forward from right side - right shoulder_hip_knee angle: 93.8
-Back rest is normal from left side - left shoulder_hip_knee angle: 102.3
-Neck is normal from right side view - right hip_shoulder_ear angle: 161.93
+Chair is TOO LOW - right hip_knee_ankle angle: 65.43
+Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: 84.08
+Back rest is BENT FORWARD from right side - right shoulder_hip_knee angle: 93.8
+Back rest is NORMAL from left side - left shoulder_hip_knee angle: 102.3
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 161.93
 f"*************************************************************************
 Description of 44.jpg:
-Neck is normal from right side view - right hip_shoulder_ear angle: 164.14
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 164.14
 f"*************************************************************************
 Description of 50.jpg:
-Neck is normal from left side view - left hip_shoulder_ear angle: 164.28 
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 164.28 
 f"*************************************************************************
 Description of 77.jpg:
-Neck is normal from right side view - right hip_shoulder_ear angle: 147.91
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 147.91
 f"*************************************************************************
 Description of 7.jpg:
 f"*************************************************************************
 Description of 35.jpg:
-Chair is too high - right hip_knee_ankle angle: 137.59
-Chair is too high - left hip_knee_ankle angle: 138.84
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 132.03
-Back rest is bent backward from left side - left shoulder_hip_knee angle: 132.89
-Neck is bent forward from left side view - left hip_shoulder_ear angle: 113.0 
+Chair is TOO HIGH - right hip_knee_ankle angle: 137.59
+Chair is TOO HIGH - left hip_knee_ankle angle: 138.84
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 132.03
+Back rest is BENT BACKWARD from left side - left shoulder_hip_knee angle: 132.89
+Neck is BENT FORWARD from left side view - left hip_shoulder_ear angle: 113.0 
 f"*************************************************************************
 Description of 47.jpg:
-Back rest is normal from left side - left shoulder_hip_knee angle: 102.2
-Neck is normal from left side view - left hip_shoulder_ear angle: 167.76 
+Back rest is NORMAL from left side - left shoulder_hip_knee angle: 102.2
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 167.76 
 f"*************************************************************************
 Description of 11.jpg:
-Chair is too high - right hip_knee_ankle angle: 102.02
-Back rest is bent backward from right side - right shoulder_hip_knee angle: 115.45
-Neck is normal from right side view - right hip_shoulder_ear angle: 142.98
+Chair is TOO HIGH - right hip_knee_ankle angle: 102.02
+Back rest is BENT BACKWARD from right side - right shoulder_hip_knee angle: 115.45
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 142.98
 f"*************************************************************************
 Description of 52.jpg:
-Neck is normal from right side view - right hip_shoulder_ear angle: 158.47
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 158.47
+Neck is BENT UPWARD from side view - right ear_eye_shoulder angle: 141.07 
 f"*************************************************************************
 Description of 75.jpg:
+Neck is BENT UPWARD from side view - right ear_eye_shoulder angle: 128.52 
 f"*************************************************************************
 Description of 8.jpg:
-Neck is normal from right side view - right hip_shoulder_ear angle: 157.97
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 157.97
 f"*************************************************************************
 Description of 59.jpg:
-Neck is normal from right side view - right hip_shoulder_ear angle: 145.74
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 145.74
 f"*************************************************************************
 Description of 33.jpg:
-Chair is too low - right hip_knee_ankle angle: 63.14
-Chair is too high - left hip_knee_ankle angle: 108.97
-Back rest is bent forward from right side - right shoulder_hip_knee angle: 90.95
-Back rest is normal from left side - left shoulder_hip_knee angle: 97.14
-Neck is normal from right side view - right hip_shoulder_ear angle: 152.59
+Chair is TOO LOW - right hip_knee_ankle angle: 63.14
+Chair is TOO HIGH - left hip_knee_ankle angle: 108.97
+Back rest is BENT FORWARD from right side - right shoulder_hip_knee angle: 90.95
+Back rest is NORMAL from left side - left shoulder_hip_knee angle: 97.14
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 152.59
 f"*************************************************************************
 Description of 34.jpg:
-Neck is normal from right side view - right hip_shoulder_ear angle: 150.92
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 150.92
 f"*************************************************************************
 Description of 40.jpg:
-Neck is normal from left side view - left hip_shoulder_ear angle: 149.1 
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 149.1 
 f"*************************************************************************
 Description of 41.jpg:
-Back rest is bent forward from right side - right shoulder_hip_knee angle: 1.66
-Back rest is bent forward from left side - left shoulder_hip_knee angle: 40.08
-Neck is bent forward from right side view - right hip_shoulder_ear angle: 72.08
-Neck is bent forward from left side view - left hip_shoulder_ear angle: 137.53 
+Back rest is BENT FORWARD from right side - right shoulder_hip_knee angle: 1.66
+Back rest is BENT FORWARD from left side - left shoulder_hip_knee angle: 40.08
+Neck is BENT FORWARD from right side view - right hip_shoulder_ear angle: 72.08
+Neck is BENT FORWARD from left side view - left hip_shoulder_ear angle: 137.53 
+Neck is BENT DOWNWARD from side view - right ear_eye_shoulder angle: 13.81 
 f"*************************************************************************
 Description of 48.jpg:
-Chair is too high - right hip_knee_ankle angle: 107.82
-Back rest is normal from right side - right shoulder_hip_knee angle: 99.52
-Neck is normal from right side view - right hip_shoulder_ear angle: 149.15
+Chair is TOO HIGH - right hip_knee_ankle angle: 107.82
+Back rest is NORMAL from right side - right shoulder_hip_knee angle: 99.52
+Neck is NORMAL from right side view - right hip_shoulder_ear angle: 149.15
 f"*************************************************************************
 Description of 1.jpg:
-Right knee status is in correct posture - right hip_knee_ankle angle: 93.37
-Left knee status is in correct posture - left hip_knee_ankle angle: 82.13
-Back rest is normal from right side - right shoulder_hip_knee angle: 106.27
-Back rest is bent forward from left side - left shoulder_hip_knee angle: 93.82
-Neck is normal from left side view - left hip_shoulder_ear angle: 149.05 
+Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: 93.37
+Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: 82.13
+Back rest is NORMAL from right side - right shoulder_hip_knee angle: 106.27
+Back rest is BENT FORWARD from left side - left shoulder_hip_knee angle: 93.82
+Neck is NORMAL from left side view - left hip_shoulder_ear angle: 149.05 
 f"*************************************************************************
 Description of 72.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 180.0 
-Right elbow is inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 14.04
-Left elbow is not inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 20.38
-Right elbow is not too wide - right neck_shoulder_elbow angle: 104.04
-Left elbow is not too wide - left neck_shoulder_elbow angle: 110.38
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 0.0 
-Neck is bent - angle between neck_nose and vertical axis: 56.82
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 180.0 
+Right elbow is INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 14.04
+Left elbow is NOT INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 20.38
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 104.04
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 110.38
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 0.0 
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is BENT - angle between neck_nose and vertical axis: 56.82
 f"*************************************************************************
 Description of 67.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 180.0 
-Right elbow is not inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 24.15
-Left elbow is not inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 32.59
-Right elbow is not too wide - right neck_shoulder_elbow angle: 114.15
-Too wide left elbow - left neck_shoulder_elbow angle: 122.59
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 0.0 
-Neck is bent - angle between neck_nose and vertical axis: 48.09
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 180.0 
+Right elbow is NOT INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 24.15
+Left elbow is NOT INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 32.59
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 114.15
+TOO WIDE left elbow - left neck_shoulder_elbow angle: 122.59
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 0.0 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is BENT - angle between neck_nose and vertical axis: 48.09
 f"*************************************************************************
 Description of 6.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 175.62 
-Right elbow is inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 8.5
-Left elbow is inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 15.15
-Right elbow is not too wide - right neck_shoulder_elbow angle: 110.64
-Left elbow is not too wide - left neck_shoulder_elbow angle: 97.39
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 10.166168436910603 
-Neck is bent - angle between neck_nose and vertical axis: 44.45
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 175.62 
+Right elbow is INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 8.5
+Left elbow is INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 15.15
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 110.64
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 97.39
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 10.166168436910603 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is BENT - angle between neck_nose and vertical axis: 44.45
 f"*************************************************************************
 Description of 76.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 180.0 
-Left elbow is inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 14.04
-Left elbow is not too wide - left neck_shoulder_elbow angle: 104.04
-Neck is bent leftward from front view - angle_between_shoulders_and_eyes: 34.69537413802969 
-Neck is normal - angle between neck_nose and vertical axis: 20.38
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 180.0 
+Left elbow is INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 14.04
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 104.04
+Neck is BENT LEFTWARD from front view - angle_between_shoulders_and_eyes: 34.69537413802969 
+Neck is NORMAL - angle between neck_nose and vertical axis: 20.38
 f"*************************************************************************
 Description of 18.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 178.74 
-Right elbow is not inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 84.64
-Left elbow is not inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 33.91
-Too wide right elbow - right neck_shoulder_elbow angle: 167.21
-Too wide left elbow - left neck_shoulder_elbow angle: 130.1
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 6.754121246886782 
-Too wide wrists
-Neck is normal - angle between neck_nose and vertical axis: 12.93
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 178.74 
+Right elbow is NOT INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 84.64
+Left elbow is NOT INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 33.91
+TOO WIDE right elbow - right neck_shoulder_elbow angle: 167.21
+TOO WIDE left elbow - left neck_shoulder_elbow angle: 130.1
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 6.754121246886782 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is NORMAL - angle between neck_nose and vertical axis: 12.93
 f"*************************************************************************
 Description of 3.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 170.96 
-Right elbow is not inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 34.82
-Left elbow is not inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 32.14
-Right elbow is not too wide - right neck_shoulder_elbow angle: 104.94
-Left elbow is not too wide - left neck_shoulder_elbow angle: 68.7
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 1.4266902624366657 
-Too wide wrists
-Neck is normal - angle between neck_nose and vertical axis: 8.75
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 170.96 
+Right elbow is NOT INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 34.82
+Left elbow is NOT INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 32.14
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 104.94
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 68.7
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 1.4266902624366657 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is NORMAL - angle between neck_nose and vertical axis: 8.75
 f"*************************************************************************
 Description of 10.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 180.0 
-Right elbow is inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 6.13
-Right elbow is not too wide - right neck_shoulder_elbow angle: 83.87
-Left elbow is not too wide - left neck_shoulder_elbow angle: 90.0
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 0.0 
-Neck is normal - angle between neck_nose and vertical axis: 12.03
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 180.0 
+Right elbow is INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 6.13
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 83.87
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 90.0
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 0.0 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is NORMAL - angle between neck_nose and vertical axis: 12.03
 f"*************************************************************************
 Description of 58.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 174.98 
-Right elbow is inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 7.12
-Right elbow is not too wide - right neck_shoulder_elbow angle: 92.1
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 2.699847911423605 
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 174.98 
+Right elbow is INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 7.12
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 92.1
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 2.699847911423605 
 f"*************************************************************************
 Description of 61.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 173.33 
-Right elbow is inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 11.45
-Right elbow is not too wide - right neck_shoulder_elbow angle: 94.78
-Left elbow is not too wide - left neck_shoulder_elbow angle: 90.0
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 18.66248488168571 
-Neck is bent - angle between neck_nose and vertical axis: 41.51
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 173.33 
+Right elbow is INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 11.45
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 94.78
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 90.0
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 18.66248488168571 
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is BENT - angle between neck_nose and vertical axis: 41.51
 f"*************************************************************************
 Description of 74.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 180.0 
-Right elbow is inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 11.58
-Left elbow is inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 18.67
-Right elbow is not too wide - right neck_shoulder_elbow angle: 101.58
-Left elbow is not too wide - left neck_shoulder_elbow angle: 108.67
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 13.670726084386027 
-Neck is bent - angle between neck_nose and vertical axis: 61.65
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 180.0 
+Right elbow is INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 11.58
+Left elbow is INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 18.67
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 101.58
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 108.67
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 13.670726084386027 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is BENT - angle between neck_nose and vertical axis: 61.65
 f"*************************************************************************
 Description of 14.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 177.19 
-Right elbow is not inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 26.56
-Left elbow is inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 12.96
-Right elbow is not too wide - right neck_shoulder_elbow angle: 109.55
-Left elbow is not too wide - left neck_shoulder_elbow angle: 112.78
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 8.266509115611193 
-Neck is bent - angle between neck_nose and vertical axis: 45.0
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 177.19 
+Right elbow is NOT INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 26.56
+Left elbow is INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 12.96
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 109.55
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 112.78
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 8.266509115611193 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is BENT - angle between neck_nose and vertical axis: 45.0
 f"*************************************************************************
 Description of 64.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 180.0 
-Right elbow is not inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 28.75
-Left elbow is inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 16.6
-Right elbow is not too wide - right neck_shoulder_elbow angle: 118.75
-Left elbow is not too wide - left neck_shoulder_elbow angle: 106.6
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 10.838840577672423 
-Neck is bent - angle between neck_nose and vertical axis: 44.63
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 180.0 
+Right elbow is NOT INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 28.75
+Left elbow is INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 16.6
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 118.75
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 106.6
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 10.838840577672423 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is BENT - angle between neck_nose and vertical axis: 44.63
 f"*************************************************************************
 Description of 43.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 180.0 
-Right elbow is inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 17.45
-Left elbow is inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 19.98
-Right elbow is not too wide - right neck_shoulder_elbow angle: 107.45
-Left elbow is not too wide - left neck_shoulder_elbow angle: 70.02
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 0.0 
-Too wide wrists
-Neck is normal - angle between neck_nose and vertical axis: 10.88
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 180.0 
+Right elbow is INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 17.45
+Left elbow is INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 19.98
+Right elbow is NOT TOO WIDE - right neck_shoulder_elbow angle: 107.45
+Left elbow is NOT TOO WIDE - left neck_shoulder_elbow angle: 70.02
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 0.0 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
+Neck is NORMAL - angle between neck_nose and vertical axis: 10.88
 f"*************************************************************************
 Description of 69.jpg:
-Shoulders are in normal posture - shoulders_neck angle: 180.0 
-Right elbow is not inline with right shoulder - Angle between right shoulder_elbow and vertical axis: 36.16
-Left elbow is not inline with left shoulder - Angle between left shoulder_elbow and vertical axis: 36.16
-Too wide right elbow - right neck_shoulder_elbow angle: 126.16
-Too wide left elbow - left neck_shoulder_elbow angle: 126.16
-Neck is not bent rightward or leftward - angle_between_shoulders_and_eyes: 0.0 
+Shoulders are in NORMAL POSTURE - shoulders_neck angle: 180.0 
+Right elbow is NOT INLINE with right shoulder - Angle between right shoulder_elbow and vertical axis: 36.16
+Left elbow is NOT INLINE with left shoulder - Angle between left shoulder_elbow and vertical axis: 36.16
+TOO WIDE right elbow - right neck_shoulder_elbow angle: 126.16
+TOO WIDE left elbow - left neck_shoulder_elbow angle: 126.16
+Neck is not BENT RIGHTWARD or leftward - angle_between_shoulders_and_eyes: 0.0 
+TOO WIDE wrists
+Two wrists  are NOT ON THE SAME SURFACE
 f"*************************************************************************
