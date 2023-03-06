@@ -1,5 +1,3 @@
 models/coco/pose_iter_440000.caffemodel
 models/mpi/pose_iter_160000.caffemodel
 venv/*
-input/*
-output/*
