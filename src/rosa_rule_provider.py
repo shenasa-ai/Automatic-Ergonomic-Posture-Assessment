@@ -120,7 +120,10 @@ class RosaRuleProvider:
                     self.description = self.description + f'Shoulders are in normal posture - shoulders_neck angle: {shoulders_neck_angle} \n'
 
             r_shoulder_elbow_angle = None
+            r_shoulder_elbow_points = [[self.pose_detector.RShoulder, self.pose_detector.RElbow]]
+
             l_shoulder_elbow_angle = None
+            l_shoulder_elbow_points = [[self.pose_detector.LShoulder, self.pose_detector.LElbow]]
 
             if points[self.pose_detector.RShoulder] and points[self.pose_detector.RElbow]:
                 r_shoulder_elbow_angle = self.get_angle_between_vector_and_vertical_axis(
@@ -133,16 +136,28 @@ class RosaRuleProvider:
             if r_shoulder_elbow_angle:
                 if r_shoulder_elbow_angle > 20:
                     armrest_score += 1
+                    self.draw_lines_between_pairs(points, r_shoulder_elbow_points, False)
                     self.description = self.description + f'Right elbow is not inline with right shoulder - ' \
+                                                          f'Angle between right shoulder_elbow and vertical axis: ' \
+                                                          f'{r_shoulder_elbow_angle}\n'
+                else:
+                    self.draw_lines_between_pairs(points, r_shoulder_elbow_points)
+                    self.description = self.description + f'Right elbow is inline with right shoulder - ' \
                                                           f'Angle between right shoulder_elbow and vertical axis: ' \
                                                           f'{r_shoulder_elbow_angle}\n'
 
             if l_shoulder_elbow_angle:
                 if l_shoulder_elbow_angle > 20:
                     armrest_score += 1
+                    self.draw_lines_between_pairs(points, l_shoulder_elbow_points, False)
                     self.description = self.description + f'Left elbow is not inline with left shoulder - ' \
                                                           f'Angle between left shoulder_elbow and vertical axis:' \
                                                           f' {l_shoulder_elbow_angle}\n'
+                else:
+                    self.draw_lines_between_pairs(points, l_shoulder_elbow_points)
+                    self.description = self.description + f'Left elbow is inline with left shoulder - ' \
+                                                          f'Angle between left shoulder_elbow and vertical axis: ' \
+                                                          f'{l_shoulder_elbow_angle}\n'
 
             r_neck_shoulder_elbow = self.get_r_neck_shoulder_elbow_angle(points)
             r_neck_shoulder_elbow_points = [[self.pose_detector.Neck, self.pose_detector.RShoulder],
@@ -273,12 +288,31 @@ class RosaRuleProvider:
                                          [self.pose_detector.LEar, self.pose_detector.LShoulder]]
         if self.camera_view_point == "front":
             # neck rule front
-            if points[self.pose_detector.LEye] and points[self.pose_detector.REye] and points[
-                self.pose_detector.LShoulder] \
-                    and points[self.pose_detector.RShoulder]:
+            if points[self.pose_detector.LEye] and points[self.pose_detector.REye] and \
+                    points[self.pose_detector.LShoulder] and points[self.pose_detector.RShoulder]:
                 v1 = np.array(points[self.pose_detector.LEye]) - np.array(points[self.pose_detector.REye])
                 v2 = np.array(points[self.pose_detector.LShoulder]) - np.array(points[self.pose_detector.RShoulder])
                 angle_between_shoulders_and_eyes = self.get_angle_between_lines(v1, v2)
+                two_eyes_vertical_axis_angle = self.get_angle_between_vector_and_vertical_axis(
+                    np.array(points[self.pose_detector.LEye]) - np.array(points[self.pose_detector.REye]))
+                two_shoulders_vertical_axis_angle = self.get_angle_between_vector_and_vertical_axis(
+                    np.array(points[self.pose_detector.LShoulder]) - np.array(points[self.pose_detector.RShoulder]))
+                two_eyes_points = [[self.pose_detector.LEye, self.pose_detector.REye]]
+                two_shoulders_points = [[self.pose_detector.LShoulder, self.pose_detector.RShoulder]]
+                if math.fabs(two_eyes_vertical_axis_angle - two_shoulders_vertical_axis_angle) > 30:
+                    if 30 < angle_between_shoulders_and_eyes < 90:
+                        self.description = self.description + f'Neck is bent leftward from front view - ' \
+                                                              f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
+                    elif 120 < angle_between_shoulders_and_eyes < 150:
+                        self.description = self.description + f'Neck is bent rightward from front view - ' \
+                                                              f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
+                    self.draw_lines_between_pairs(points, two_eyes_points, False)
+                    self.draw_lines_between_pairs(points, two_shoulders_points, False)
+                else:
+                    self.description = self.description + f'Neck is not bent rightward or leftward - ' \
+                                                          f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
+                    self.draw_lines_between_pairs(points, two_eyes_points)
+                    self.draw_lines_between_pairs(points, two_shoulders_points)
 
             # # neck rule twist side
             # neck_twisted_status_from_side = self.is_neck_twisted_from_side(points)
@@ -492,10 +526,12 @@ class RosaRuleProvider:
                     updated_point_b1 = points[part_b][0] + 5
                     updated_point_b2 = points[part_b][1] + 5
                     if is_correct_edge:
-                        cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2), (0, 255, 255),
+                        cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
+                                 (0, 255, 255),
                                  self.line_thickness)
                     else:
-                        cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2), (0, 0, 255),
+                        cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
+                                 (0, 0, 255),
                                  self.line_thickness)
                         self.repetitive_pairs.append(pair)
                 else:
