@@ -3,7 +3,7 @@ import cv2
 import openpifpaf
 from PIL import Image
 import numpy as np
-
+from matplotlib import pyplot as plt
 
 class OpenpifpafPoseDetector(PoseDetector):
     Nose = 0
@@ -37,6 +37,30 @@ class OpenpifpafPoseDetector(PoseDetector):
         image = Image.fromarray(image, 'RGB')
         return image, dim
 
+
+    def calc_disply_joints(self, prediction):
+        plt.imshow(self.image)
+        xx = []
+        yy = []
+        zz = []
+        # for p in range(len(prediction)):
+        for i in range(17):
+            # predictions[0].data[i]
+            import pudb; pu.db
+            x = prediction[i].data[0]
+            y = prediction[i].data[1]
+            z = prediction[i].data[2]
+            if x > 0 and y > 0:
+                xx.append(x)
+                yy.append(y)
+                zz.append(z)
+        # im2 = image.copy()
+        # plt.sca(axs.flatten()[0])
+        # plt.imshow(im2)
+        plt.scatter(xx, yy, s=3)
+        # plt.title('Joints')
+        plt.axis('off')
+
     def preprocess_image(self, image):
         import pudb; pu.db
         self.image, dim = self.resize(image)
@@ -48,8 +72,10 @@ class OpenpifpafPoseDetector(PoseDetector):
         for i in range(0, len(pred)):
             keypoints = [pred[i]['keypoints'][s:s + 3:] for s in range(0, len(pred[i]['keypoints']), 3)]
             keypoints = np.array(keypoints)
-            new_keypoints = list(map(lambda x: tuple([int(x[0]), int(x[2])]), keypoints))
+            self.calc_disply_joints(keypoints)
+            new_keypoints = list(map(lambda x: tuple([int(x[0]), int(x[1])]), keypoints))
             self.model_output = new_keypoints
+
         return np.array(self.image)
 
     def get_joint_points(self) -> []:
