@@ -2,7 +2,7 @@ import argparse
 import os
 import cv2
 from src.pose_detector import PoseDetector
-from src.open_pose_detector import OpenPoseDetector
+from src.openpose_detector import OpenPoseDetector
 from src.mediapipe_pose_detector import MediapipePoseDetector
 from src.openpifpaf_pose_detector import OpenpifpafPoseDetector
 from src.rosa_rule_provider import RosaRuleProvider
