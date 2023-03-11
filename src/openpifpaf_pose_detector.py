@@ -46,7 +46,6 @@ class OpenpifpafPoseDetector(PoseDetector):
         # for p in range(len(prediction)):
         for i in range(17):
             # predictions[0].data[i]
-            import pudb; pu.db
             x = prediction[i].data[0]
             y = prediction[i].data[1]
             z = prediction[i].data[2]
@@ -54,15 +53,14 @@ class OpenpifpafPoseDetector(PoseDetector):
                 xx.append(x)
                 yy.append(y)
                 zz.append(z)
-        # im2 = image.copy()
-        # plt.sca(axs.flatten()[0])
-        # plt.imshow(im2)
+        im2 = self.image.copy()
+        #plt.sca(axs.flatten()[0])
+        plt.imshow(im2)
         plt.scatter(xx, yy, s=3)
-        # plt.title('Joints')
+        plt.title('Joints')
         plt.axis('off')
 
     def preprocess_image(self, image):
-        import pudb; pu.db
         self.image, dim = self.resize(image)
         predictions, gt_anns, image_meta = self.predictor.pil_image(self.image)
         
@@ -70,11 +68,19 @@ class OpenpifpafPoseDetector(PoseDetector):
         for i in predictions:
             pred.append(i.json_data())
         for i in range(0, len(pred)):
+            new_keypoint2 = []
             keypoints = [pred[i]['keypoints'][s:s + 3:] for s in range(0, len(pred[i]['keypoints']), 3)]
             keypoints = np.array(keypoints)
             self.calc_disply_joints(keypoints)
             new_keypoints = list(map(lambda x: tuple([int(x[0]), int(x[1])]), keypoints))
-            self.model_output = new_keypoints
+            prob = list(map(lambda x: x[2], keypoints))
+            for i in range(len(prob)):
+                if prob[i] > 0.1:  # th
+                    new_keypoint2.append(new_keypoints[i])
+                else:
+                    new_keypoint2.append(None)
+
+            self.model_output = new_keypoint2
 
         return np.array(self.image)
 
