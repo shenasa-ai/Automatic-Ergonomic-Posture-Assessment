@@ -1,7 +1,7 @@
 import math
 import os
 import numpy as np
-from src.pose_detector import PoseDetector
+from pose_detector import PoseDetector
 from matplotlib import pyplot as plt
 from face_blurring import FaceBlurring
 import cv2
@@ -71,6 +71,7 @@ class RosaRuleProvider:
         if self.camera_view_point == "side":
             r_hip_knee_ankle_angle = self.get_r_hip_knee_ankle_angle()
             l_hip_knee_ankle_angle = self.get_l_hip_knee_ankle_angle()
+            
             r_hip_knee_ankle_points = [[self.pose_detector.RHip, self.pose_detector.RKnee],
                                        [self.pose_detector.RKnee, self.pose_detector.RAnkle]]
             l_hip_knee_ankle_points = [[self.pose_detector.LHip, self.pose_detector.LKnee],
@@ -523,7 +524,11 @@ class RosaRuleProvider:
         if p1 and p2 and p3:
             v1, v2 = self.get_vectors_between_points(p2, p1, p2, p3)
             angle = self.get_angle_between_lines(v1, v2)
-            return round(angle, 2)
+            import pudb; pu.db
+            if angle is None:
+                return None
+            else:
+                return round(angle, 2)
         else:
             return None
 

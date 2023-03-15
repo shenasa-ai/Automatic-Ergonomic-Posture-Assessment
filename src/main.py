@@ -1,13 +1,13 @@
 import argparse
 import os
 import cv2
-from src.pose_detector import PoseDetector
-from src.openpose_detector import OpenPoseDetector
-from src.mediapipe_pose_detector import MediapipePoseDetector
-from src.openpifpaf_pose_detector import OpenpifpafPoseDetector
-from src.rosa_rule_provider import RosaRuleProvider
+from pose_detector import PoseDetector
+from open_pose_detector import OpenPoseDetector
+from mediapipe_pose_detector import MediapipePoseDetector
+# from openpifpaf_pose_detector import OpenpifpafPoseDetector
+from rosa_rule_provider import RosaRuleProvider
 
-deep_model = "openpose"
+deep_model = "Mediapipe" #"Openpifpaf"  #"openpose" 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_path', default='../input', help='path to input directory')
@@ -21,6 +21,8 @@ def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provide
     for file in os.listdir(root_dir):
         file_name = os.fsdecode(file)
         image = cv2.imread(f'{root_dir}/{file_name}')
+        if file == '72.jpg':
+            import pudb; pu.db
         resized_image = pose_detector.preprocess_image(image)
         points = pose_detector.get_joint_points()
         position_status = rosa_rule_provider.get_posture_status(resized_image, points, file_name, camera_view_point)

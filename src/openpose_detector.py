@@ -3,7 +3,7 @@ from PIL import Image
 import sys
 import numpy as np
 import enum
-from src.pose_detector import PoseDetector
+from pose_detector import PoseDetector
 
 
 class OpenPoseDetector(PoseDetector):
