@@ -21,8 +21,9 @@ def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provide
     for file in os.listdir(root_dir):
         file_name = os.fsdecode(file)
         image = cv2.imread(f'{root_dir}/{file_name}')
-        if file == '72.jpg':
-            import pudb; pu.db
+        import pudb; pu.db
+        #if file == '72.jpg':
+        #    import pudb; pu.db
         resized_image = pose_detector.preprocess_image(image)
         points = pose_detector.get_joint_points()
         position_status = rosa_rule_provider.get_posture_status(resized_image, points, file_name, camera_view_point)
@@ -31,7 +32,6 @@ def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provide
 
 
 def main():
-    import pudb; pu.db
     os.makedirs(args.output_path, exist_ok=True)
 
     input_directory = os.fsencode(args.input_path).decode("utf-8")

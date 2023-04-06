@@ -30,27 +30,36 @@ class RosaRuleProvider:
         monitor_score = 1
         phone_score = 1
         mouse_score = 1
-
         if draw_joint_points:
-            self.display_joint_points()
+            self.display_joint_points(file_name)
 
         print(f'ROSA score is checking for {file_name} ...\n')
 
-        # Chair Height & Pan Depth (3/7)
-        chair_score = self.get_chair_score()
+        if self.camera_view_point == "side":
+            # Chair Height & Pan Depth (3/7)
+            chair_score = self.get_chair_score()
 
-        # Armrest (3/4)
-        armrest_score = self.get_armrest_score()
+            # Backrest (2/5)
+            backrest_score = self.get_backrest_score()
 
-        # Backrest (3/5)
-        backrest_score = self.get_backrest_score()
+            # Monitor (0/6)
+            monitor_score = self.get_monitor_score()
 
-        # Monitor (0/6)
-        monitor_score = self.get_monitor_score()
+        else:
 
-        # Telephone (1/3)
-        phone_score = self.get_phone_score()
-        import pudb; pu.db
+            # Armrest (3/4)
+            armrest_score = self.get_armrest_score()
+
+            # Backrest (1/5)
+            backrest_score = self.get_backrest_score()
+
+            # Monitor (0/6)
+            monitor_score = self.get_monitor_score()
+
+            # Telephone (1/3)
+            phone_score = self.get_phone_score()
+
+        #import pudb; pu.db
         if  (chair_score > 1 if chair_score else True)  or (armrest_score > 1 if armrest_score else True) or (backrest_score > 1 if backrest_score else True) or (monitor_score > 1 if monitor_score else True) or (phone_score > 1 if phone_score else True):
 #        armrest_score > 1 or backrest_score > 1 or monitor_score > 1 or phone_score > 1:
             posture_status = False
@@ -69,46 +78,45 @@ class RosaRuleProvider:
     def get_chair_score(self):
         chair_score = 1
 
-        if self.camera_view_point == "side":
-            r_hip_knee_ankle_angle = self.get_r_hip_knee_ankle_angle()
-            l_hip_knee_ankle_angle = self.get_l_hip_knee_ankle_angle()
-            
-            r_hip_knee_ankle_points = [[self.pose_detector.RHip, self.pose_detector.RKnee],
-                                       [self.pose_detector.RKnee, self.pose_detector.RAnkle]]
-            l_hip_knee_ankle_points = [[self.pose_detector.LHip, self.pose_detector.LKnee],
-                                       [self.pose_detector.LKnee, self.pose_detector.LAnkle]]
+        r_hip_knee_ankle_angle = self.get_r_hip_knee_ankle_angle()
+        l_hip_knee_ankle_angle = self.get_l_hip_knee_ankle_angle()
+        
+        r_hip_knee_ankle_points = [[self.pose_detector.RHip, self.pose_detector.RKnee],
+                                   [self.pose_detector.RKnee, self.pose_detector.RAnkle]]
+        l_hip_knee_ankle_points = [[self.pose_detector.LHip, self.pose_detector.LKnee],
+                                   [self.pose_detector.LKnee, self.pose_detector.LAnkle]]
 
-            if r_hip_knee_ankle_angle or l_hip_knee_ankle_angle:
-                if r_hip_knee_ankle_angle:
-                    if r_hip_knee_ankle_angle < 80:
-                        chair_score = 2
-                        self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
-                        self.description = self.description + f'Chair is TOO LOW - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
-                    elif r_hip_knee_ankle_angle > 100:
-                        chair_score = 2
-                        self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
-                        self.description = self.description + f'Chair is TOO HIGH - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
-                    else:
-                        self.draw_lines_between_pairs(r_hip_knee_ankle_points)
-                        self.description = self.description + \
-                                           f'Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
+        if r_hip_knee_ankle_angle or l_hip_knee_ankle_angle:
+            if r_hip_knee_ankle_angle:
+                if r_hip_knee_ankle_angle < 80:
+                    chair_score = 2
+                    self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
+                    self.description = self.description + f'Chair is TOO LOW - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
+                elif r_hip_knee_ankle_angle > 100:
+                    chair_score = 2
+                    self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
+                    self.description = self.description + f'Chair is TOO HIGH - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
+                else:
+                    self.draw_lines_between_pairs(r_hip_knee_ankle_points)
+                    self.description = self.description + \
+                                       f'Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
 
-                if l_hip_knee_ankle_angle:
-                    if l_hip_knee_ankle_angle < 80:
-                        chair_score = 2
-                        self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
-                        self.description = self.description + f'Chair is TOO LOW - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
-                    elif l_hip_knee_ankle_angle > 100:
-                        chair_score = 2
-                        self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
-                        self.description = self.description + f'Chair is TOO HIGH - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
-                    else:
-                        self.draw_lines_between_pairs(l_hip_knee_ankle_points)
-                        self.description = self.description + \
-                                           f'Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
-            else:
-                print("Not Enough Info")
-                chair_score = None
+            if l_hip_knee_ankle_angle:
+                if l_hip_knee_ankle_angle < 80:
+                    chair_score = 2
+                    self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
+                    self.description = self.description + f'Chair is TOO LOW - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
+                elif l_hip_knee_ankle_angle > 100:
+                    chair_score = 2
+                    self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
+                    self.description = self.description + f'Chair is TOO HIGH - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
+                else:
+                    self.draw_lines_between_pairs(l_hip_knee_ankle_points)
+                    self.description = self.description + \
+                                       f'Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
+        else:
+            print("Not Enough Info")
+            chair_score = None
         return chair_score
 
     def get_armrest_score(self):
@@ -201,42 +209,65 @@ class RosaRuleProvider:
         backrest_score = 1
 
         if self.camera_view_point == "side":
-            r_shoulder_hip_knee = self.get_r_shoulder_hip_knee_angle()
-            r_shoulder_hip_knee_points = [[self.pose_detector.RShoulder, self.pose_detector.RHip],
-                                          [self.pose_detector.RHip, self.pose_detector.RKnee]]
-            l_shoulder_hip_knee = self.get_l_shoulder_hip_knee_angle()
-            l_shoulder_hip_knee_points = [[self.pose_detector.LShoulder, self.pose_detector.LHip],
-                                          [self.pose_detector.LHip, self.pose_detector.LKnee]]
-            if r_shoulder_hip_knee:
-                if r_shoulder_hip_knee < 95:
-                    backrest_score = 2
-                    self.draw_lines_between_pairs(r_shoulder_hip_knee_points, False)
-                    self.description = self.description + f'Back rest is BENT FORWARD from right side - ' \
-                                                          f'right shoulder_hip_knee angle: {r_shoulder_hip_knee}\n'
-                elif r_shoulder_hip_knee > 110:
-                    backrest_score = 2
-                    self.draw_lines_between_pairs(r_shoulder_hip_knee_points, False)
-                    self.description = self.description + f'Back rest is BENT BACKWARD from right side - ' \
-                                                          f'right shoulder_hip_knee angle: {r_shoulder_hip_knee}\n'
-                else:
-                    self.draw_lines_between_pairs(r_shoulder_hip_knee_points)
-                    self.description = self.description + f'Back rest is NORMAL from right side - ' \
-                                                          f'right shoulder_hip_knee angle: {r_shoulder_hip_knee}\n'
+            import pudb; pu.db 
+            if (((self.points[self.pose_detector.LHip] is not None) and 
+                    (self.points[self.pose_detector.LShoulder] is not None)) or
+                    ((self.points[self.pose_detector.RHip] is not None) and
+                        (self.points[self.pose_detector.RShoulder] is not None))):
 
-            if l_shoulder_hip_knee:
-                if l_shoulder_hip_knee < 95:
-                    backrest_score = 2
-                    self.draw_lines_between_pairs(l_shoulder_hip_knee_points, False)
-                    self.description = self.description + f'Back rest is BENT FORWARD from left side - ' \
-                                                          f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
-                elif l_shoulder_hip_knee > 110:
-                    backrest_score = 2
-                    self.draw_lines_between_pairs(l_shoulder_hip_knee_points, False)
-                    self.description = self.description + f'Back rest is BENT BACKWARD from left side - ' \
-                                                          f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
-                else:
-                    self.draw_lines_between_pairs(l_shoulder_hip_knee_points)
-                    self.description = self.description + f'Back rest is NORMAL from left side - ' \
+                if self.points[self.pose_detector.RHip] is None:  # if one of the hips is not available
+                    self.points[self.pose_detector.RHip] = self.points[self.pose_detector.LHip]
+                elif self.points[self.pose_detector.LHip] is None:
+                    self.points[self.pose_detector.LHip] = self.points[self.pose_detector.RHip]
+
+                if self.points[self.pose_detector.RShoulder] is None:  # if one of the shoulders is not available
+                    self.points[self.pose_detector.RShoulder] = self.points[self.pose_detector.LShoulder]
+                elif self.points[self.pose_detector.LShoulder] is None:
+                    self.points[self.pose_detector.LShoulder] = self.points[self.pose_detector.RShoulder]
+                
+                # middle of shoulders (x coordinate)
+                MidHip = tuple((np.array(self.points[self.pose_detector.RHip]) + 
+                    np.array(self.points[self.pose_detector.LHip])/2).astype(int))
+                MidShoulder = tuple((np.array(self.points[self.pose_detector.RShoulder]) + 
+                    np.array(self.points[self.pose_detector.LShoulder])/2).astype(int))
+
+
+                mid_shoulder_hip_knee = self.get_mid_shoulder_hip_knee_angle(MidHip, MidShoulder)
+                r_shoulder_hip_knee_points = [[self.pose_detector.RShoulder, self.pose_detector.RHip],
+                                              [self.pose_detector.RHip, self.pose_detector.RKnee]]
+                #l_shoulder_hip_knee = self.get_l_shoulder_hip_knee_angle()
+                #l_shoulder_hip_knee_points = [[self.pose_detector.LShoulder, self.pose_detector.LHip],
+                #                              [self.pose_detector.LHip, self.pose_detector.LKnee]]
+                if r_shoulder_hip_knee:
+                    if r_shoulder_hip_knee < 95:
+                        backrest_score = 2
+                        self.draw_lines_between_pairs(r_shoulder_hip_knee_points, False)
+                        self.description = self.description + f'Back rest is BENT FORWARD from right side - ' \
+                                                              f'right shoulder_hip_knee angle: {r_shoulder_hip_knee}\n'
+                    elif r_shoulder_hip_knee > 110:
+                        backrest_score = 2
+                        self.draw_lines_between_pairs(r_shoulder_hip_knee_points, False)
+                        self.description = self.description + f'Back rest is BENT BACKWARD from right side - ' \
+                                                              f'right shoulder_hip_knee angle: {r_shoulder_hip_knee}\n'
+                    else:
+                        self.draw_lines_between_pairs(r_shoulder_hip_knee_points)
+                        self.description = self.description + f'Back rest is NORMAL from right side - ' \
+                                                              f'right shoulder_hip_knee angle: {r_shoulder_hip_knee}\n'
+
+                if l_shoulder_hip_knee:
+                    if l_shoulder_hip_knee < 95:
+                        backrest_score = 2
+                        self.draw_lines_between_pairs(l_shoulder_hip_knee_points, False)
+                        self.description = self.description + f'Back rest is BENT FORWARD from left side - ' \
+                                                              f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
+                    elif l_shoulder_hip_knee > 110:
+                        backrest_score = 2
+                        self.draw_lines_between_pairs(l_shoulder_hip_knee_points, False)
+                        self.description = self.description + f'Back rest is BENT BACKWARD from left side - ' \
+                                                              f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
+                    else:
+                        self.draw_lines_between_pairs(l_shoulder_hip_knee_points)
+                        self.description = self.description + f'Back rest is NORMAL from left side - ' \
                                                           f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
         if self.camera_view_point == "front":
             shoulders_neck_angle = self.get_shoulders_neck_angle()
@@ -420,17 +451,19 @@ class RosaRuleProvider:
                                               self.points[self.pose_detector.LElbow])
         return angle
 
-    def get_r_shoulder_hip_knee_angle(self):
+    def get_mid_shoulder_hip_knee_angle(self, MidHip, MidShoulder):
         # rShoulderHipKnee_pairs = [[2, 8], [8, 9]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.RShoulder], self.points[self.pose_detector.RHip],
-                                              self.points[self.pose_detector.RKnee])
+        #angle = self.get_angle_between_points(self.points[self.pose_detector.RShoulder], self.points[self.pose_detector.RHip],
+        #                                      self.points[self.pose_detector.RKnee])
+        angle = self.get_angle_between_vector_and_vertical_axis(
+                np.array(MidHip) - np.array(MidShoulder))
         return angle
 
-    def get_l_shoulder_hip_knee_angle(self):
+    #def get_l_shoulder_hip_knee_angle(self):
         # lShoulderHipKnee_pairs = [[5, 11], [11, 12]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.LShoulder], self.points[self.pose_detector.LHip],
-                                              self.points[self.pose_detector.LKnee])
-        return angle
+    #    angle = self.get_angle_between_points(self.points[self.pose_detector.LShoulder], self.points[self.pose_detector.LHip],
+    #                                          self.points[self.pose_detector.LKnee])
+    #    return angle
 
     def get_r_shoulder_elbow_wrist(self):
         # r_shoulder_elbow_wrist_pairs = [[2, 3], [3, 4]]
@@ -529,7 +562,7 @@ class RosaRuleProvider:
         if p1 and p2 and p3:
             v1, v2 = self.get_vectors_between_points(p2, p1, p2, p3)
             angle = self.get_angle_between_lines(v1, v2)
-            import pudb; pu.db
+            #import pudb; pu.db
             if angle is None:
                 return None
             else:
@@ -537,10 +570,11 @@ class RosaRuleProvider:
         else:
             return None
 
-    def display_joint_points(self):
+    def display_joint_points(self, file_name):
         for point in self.points:
             if point:
                 cv2.circle(self.image, point, self.circle_radius, (0, 255, 0), thickness=-1, lineType=cv2.FILLED)
+        cv2.imwrite(f'../joints/{file_name}', self.image)
 
     def draw_lines_between_pairs(self, pairs, is_correct_edge=True):
         for pair in pairs:

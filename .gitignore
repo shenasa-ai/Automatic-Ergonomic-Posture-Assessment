@@ -4,3 +4,4 @@ venv/*
 src/__pycache__/*
 src/*.swp
 output/*
+joints/*
