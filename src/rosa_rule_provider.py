@@ -50,8 +50,9 @@ class RosaRuleProvider:
 
         # Telephone (1/3)
         phone_score = self.get_phone_score()
-
-        if chair_score > 1 or armrest_score > 1 or backrest_score > 1 or monitor_score > 1 or phone_score > 1:
+        import pudb; pu.db
+        if  (chair_score > 1 if chair_score else True)  or (armrest_score > 1 if armrest_score else True) or (backrest_score > 1 if backrest_score else True) or (monitor_score > 1 if monitor_score else True) or (phone_score > 1 if phone_score else True):
+#        armrest_score > 1 or backrest_score > 1 or monitor_score > 1 or phone_score > 1:
             posture_status = False
         else:
             posture_status = True
@@ -77,33 +78,37 @@ class RosaRuleProvider:
             l_hip_knee_ankle_points = [[self.pose_detector.LHip, self.pose_detector.LKnee],
                                        [self.pose_detector.LKnee, self.pose_detector.LAnkle]]
 
-            if r_hip_knee_ankle_angle:
-                if r_hip_knee_ankle_angle < 80:
-                    chair_score = 2
-                    self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
-                    self.description = self.description + f'Chair is TOO LOW - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
-                elif r_hip_knee_ankle_angle > 100:
-                    chair_score = 2
-                    self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
-                    self.description = self.description + f'Chair is TOO HIGH - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
-                else:
-                    self.draw_lines_between_pairs(r_hip_knee_ankle_points)
-                    self.description = self.description + \
-                                       f'Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
+            if r_hip_knee_ankle_angle or l_hip_knee_ankle_angle:
+                if r_hip_knee_ankle_angle:
+                    if r_hip_knee_ankle_angle < 80:
+                        chair_score = 2
+                        self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
+                        self.description = self.description + f'Chair is TOO LOW - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
+                    elif r_hip_knee_ankle_angle > 100:
+                        chair_score = 2
+                        self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
+                        self.description = self.description + f'Chair is TOO HIGH - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
+                    else:
+                        self.draw_lines_between_pairs(r_hip_knee_ankle_points)
+                        self.description = self.description + \
+                                           f'Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
 
-            if l_hip_knee_ankle_angle:
-                if l_hip_knee_ankle_angle < 80:
-                    chair_score = 2
-                    self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
-                    self.description = self.description + f'Chair is TOO LOW - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
-                elif l_hip_knee_ankle_angle > 100:
-                    chair_score = 2
-                    self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
-                    self.description = self.description + f'Chair is TOO HIGH - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
-                else:
-                    self.draw_lines_between_pairs(l_hip_knee_ankle_points)
-                    self.description = self.description + \
-                                       f'Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
+                if l_hip_knee_ankle_angle:
+                    if l_hip_knee_ankle_angle < 80:
+                        chair_score = 2
+                        self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
+                        self.description = self.description + f'Chair is TOO LOW - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
+                    elif l_hip_knee_ankle_angle > 100:
+                        chair_score = 2
+                        self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
+                        self.description = self.description + f'Chair is TOO HIGH - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
+                    else:
+                        self.draw_lines_between_pairs(l_hip_knee_ankle_points)
+                        self.description = self.description + \
+                                           f'Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
+            else:
+                print("Not Enough Info")
+                chair_score = None
         return chair_score
 
     def get_armrest_score(self):

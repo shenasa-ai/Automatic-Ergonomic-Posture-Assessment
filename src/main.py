@@ -2,12 +2,12 @@ import argparse
 import os
 import cv2
 from pose_detector import PoseDetector
-from open_pose_detector import OpenPoseDetector
+from openpose_detector import OpenPoseDetector
 from mediapipe_pose_detector import MediapipePoseDetector
-# from openpifpaf_pose_detector import OpenpifpafPoseDetector
+from openpifpaf_pose_detector import OpenpifpafPoseDetector
 from rosa_rule_provider import RosaRuleProvider
 
-deep_model = "Mediapipe" #"Openpifpaf"  #"openpose" 
+deep_model = "Openpifpaf" #"Mediapipe" #"Openpifpaf"  #"openpose" 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_path', default='../input', help='path to input directory')
@@ -31,6 +31,7 @@ def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provide
 
 
 def main():
+    import pudb; pu.db
     os.makedirs(args.output_path, exist_ok=True)
 
     input_directory = os.fsencode(args.input_path).decode("utf-8")
