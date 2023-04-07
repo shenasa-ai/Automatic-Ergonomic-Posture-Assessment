@@ -5,3 +5,5 @@ src/__pycache__/*
 src/*.swp
 output/*
 joints/*
+input/*
+input_internet/*
