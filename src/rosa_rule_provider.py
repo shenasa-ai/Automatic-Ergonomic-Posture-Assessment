@@ -15,14 +15,15 @@ class RosaRuleProvider:
         self.circle_radius = 3
         self.line_thickness = 2
         self.description = ""
-        self.repetitive_pairs = []
+        #self.repetitive_pairs = []
         self.camera_view_point = "front"
 
-    def get_posture_status(self, image, points, file_name, view_point, draw_joint_points=True):
+    def get_posture_status(self, image, points, file_name, view_point, output_path, draw_joint_points=True):
         self.description = ""
         self.image = image
         self.points = points
         self.camera_view_point = view_point
+        self.output_path = output_path
         posture_status = False
         chair_score = 1
         armrest_score = 1
@@ -30,6 +31,7 @@ class RosaRuleProvider:
         monitor_score = 1
         phone_score = 1
         mouse_score = 1
+        self.file_name = os.path.splitext(file_name)[0]
         if draw_joint_points:
             self.display_joint_points(file_name)
 
@@ -90,28 +92,28 @@ class RosaRuleProvider:
             if r_hip_knee_ankle_angle:
                 if r_hip_knee_ankle_angle < 80:
                     chair_score = 2
-                    self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
+                    self.draw_lines_between_pairs(r_hip_knee_ankle_points, 'chair_score', r_hip_knee_ankle_angle, False)
                     self.description = self.description + f'Chair is TOO LOW - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
                 elif r_hip_knee_ankle_angle > 100:
                     chair_score = 2
-                    self.draw_lines_between_pairs(r_hip_knee_ankle_points, False)
+                    self.draw_lines_between_pairs(r_hip_knee_ankle_points, 'chair_score', r_hip_knee_ankle_angle, False)
                     self.description = self.description + f'Chair is TOO HIGH - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
                 else:
-                    self.draw_lines_between_pairs(r_hip_knee_ankle_points)
+                    self.draw_lines_between_pairs(r_hip_knee_ankle_points, 'chair_score', r_hip_knee_ankle_angle)
                     self.description = self.description + \
                                        f'Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
 
             if l_hip_knee_ankle_angle:
                 if l_hip_knee_ankle_angle < 80:
                     chair_score = 2
-                    self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
+                    self.draw_lines_between_pairs(l_hip_knee_ankle_points,'chair_score', l_hip_knee_ankle_angle, False)
                     self.description = self.description + f'Chair is TOO LOW - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
                 elif l_hip_knee_ankle_angle > 100:
                     chair_score = 2
-                    self.draw_lines_between_pairs(l_hip_knee_ankle_points, False)
+                    self.draw_lines_between_pairs(l_hip_knee_ankle_points, 'chair_score', l_hip_knee_ankle_angle, False)
                     self.description = self.description + f'Chair is TOO HIGH - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
                 else:
-                    self.draw_lines_between_pairs(l_hip_knee_ankle_points)
+                    self.draw_lines_between_pairs(l_hip_knee_ankle_points, 'chair_score', l_hip_knee_ankle_angle)
                     self.description = self.description + \
                                        f'Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
         else:
@@ -209,7 +211,7 @@ class RosaRuleProvider:
         backrest_score = 1
 
         if self.camera_view_point == "side":
-            import pudb; pu.db 
+            #import pudb; pu.db 
             if (((self.points[self.pose_detector.LHip] is not None) and 
                     (self.points[self.pose_detector.LShoulder] is not None)) or
                     ((self.points[self.pose_detector.RHip] is not None) and
@@ -231,7 +233,7 @@ class RosaRuleProvider:
                 MidShoulder = tuple(((np.array(self.points[self.pose_detector.RShoulder]) + 
                     np.array(self.points[self.pose_detector.LShoulder]))/2).astype(int))
 
-                import pudb; pu.db
+                #import pudb; pu.db
                 mid_shoulder_hip_knee = self.get_mid_shoulder_hip_knee_angle(MidHip, MidShoulder)
                 mid_shoulder_hip_knee_points = [list(MidHip), list(MidShoulder)]
                 #l_shoulder_hip_knee = self.get_l_shoulder_hip_knee_angle()
@@ -240,7 +242,7 @@ class RosaRuleProvider:
                 if mid_shoulder_hip_knee:
                     if mid_shoulder_hip_knee < 95:
                         backrest_score = 2
-                        import pudb; pu.db
+                        #import pudb; pu.db
                         self.draw_lines_between_pairs(mid_shoulder_hip_knee_points, False, True)
                         self.description = self.description + f'Back rest is BENT FORWARD from right side - ' \
                                                               f'right shoulder_hip_knee angle: {mid_shoulder_hip_knee}\n'
@@ -577,7 +579,7 @@ class RosaRuleProvider:
                 cv2.circle(self.image, point, self.circle_radius, (0, 255, 0), thickness=-1, lineType=cv2.FILLED)
         cv2.imwrite(f'../joints/{file_name}', self.image)
 
-    def draw_lines_between_pairs(self, pairs, is_correct_edge=True, is_point_pixel=False):
+    def draw_lines_between_pairs(self, pairs, rule_name, angle, is_correct_edge=True, is_point_pixel=False):
         import pudb; pu.db
         #for pair in pairs:
         #    part_a = pair[0]
@@ -588,60 +590,65 @@ class RosaRuleProvider:
                 part_a = pair[0]
                 part_b = pair[1]
                 if self.points[part_a] and self.points[part_b]:
-                    if pair in self.repetitive_pairs:
-                        import pudb; pu.db
-                        updated_point_a1 = self.points[part_a][0] + 5
-                        updated_point_a2 = self.points[part_a][1] + 5
-                        updated_point_b1 = self.points[part_b][0] + 5
-                        updated_point_b2 = self.points[part_b][1] + 5
-                        if is_correct_edge:
-                            cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
-                                     (0, 255, 255), self.line_thickness)
-                        else:
-                            cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
-                                     (0, 0, 255), self.line_thickness)
-                            self.repetitive_pairs.append(pair)
+                    #if pair in self.repetitive_pairs:
+                    #    import pudb; pu.db
+                    #    updated_point_a1 = self.points[part_a][0] + 5
+                    #    updated_point_a2 = self.points[part_a][1] + 5
+                    #    updated_point_b1 = self.points[part_b][0] + 5
+                    #    updated_point_b2 = self.points[part_b][1] + 5
+                    #    if is_correct_edge:
+                    #        cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
+                    #                 (0, 255, 255), self.line_thickness)
+                    #    else:
+                    #        cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
+                    #                 (0, 0, 255), self.line_thickness)
+                    #        self.repetitive_pairs.append(pair)
+                    #else:
+                    if is_correct_edge:
+                        temp_img = cv2.line(self.image, self.points[part_a], self.points[part_b], (0, 255, 0), self.line_thickness)
+                        self.save_image(temp_img, is_correct_edge, self.output_path, self.file_name+ f'_{rule_name}' + '.JPG', rule_name, angle)
+
                     else:
-                        if is_correct_edge:
-                            cv2.line(self.image, self.points[part_a], self.points[part_b], (0, 255, 255), self.line_thickness)
-                        else:
-                            cv2.line(self.image, self.points[part_a], self.points[part_b], (0, 0, 255), self.line_thickness)
-                        self.repetitive_pairs.append(pair)
-                    self.repetitive_pairs.append(pair)
-                else:
-                    if pair in self.repetitive_pairs:
-                        import pudb; pu.db
-                        updated_point_a1 = self.points[part_a][0] + 5
-                        updated_point_a2 = self.points[part_a][1] + 5
-                        updated_point_b1 = self.points[part_b][0] + 5
-                        updated_point_b2 = self.points[part_b][1] + 5
-                        if is_correct_edge:
-                            cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
-                                     (0, 255, 255), self.line_thickness)
-                        else:
-                            cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
-                                     (0, 0, 255), self.line_thickness)
-                            self.repetitive_pairs.append(pair)
-                    else:
-                        if is_correct_edge:
-                            cv2.line(self.image, self.points[part_a], self.points[part_b], (0, 255, 255), self.line_thickness)
-                        else:
-                            cv2.line(self.image, self.points[part_a], self.points[part_b], (0, 0, 255), self.line_thickness)
-                        self.repetitive_pairs.append(pair)
-                    self.repetitive_pairs.append(pair)
+                        temp_img = cv2.line(self.image, self.points[part_a], self.points[part_b], (0, 0, 255), self.line_thickness)
+                        self.save_image(temp_img, is_correct_edge, self.output_path, self.file_name+ f'_{rule_name}' + '.JPG', rule_name, angle)
+                    #self.repetitive_pairs.append(pair)
+                    #self.repetitive_pairs.append(pair)
+                #else:
+                #    if pair in self.repetitive_pairs:
+                #        import pudb; pu.db
+                #        updated_point_a1 = self.points[part_a][0] + 5
+                #        updated_point_a2 = self.points[part_a][1] + 5
+                #        updated_point_b1 = self.points[part_b][0] + 5
+                #        updated_point_b2 = self.points[part_b][1] + 5
+                #        if is_correct_edge:
+                #            cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
+                #                     (0, 255, 255), self.line_thickness)
+                #        else:
+                #            cv2.line(self.image, (updated_point_a1, updated_point_a2), (updated_point_b1, updated_point_b2),
+                #                     (0, 0, 255), self.line_thickness)
+                #            self.repetitive_pairs.append(pair)
+                #    else:
+                #        if is_correct_edge:
+                #            cv2.line(self.image, self.points[part_a], self.points[part_b], (0, 255, 255), self.line_thickness)
+                #        else:
+                #            cv2.line(self.image, self.points[part_a], self.points[part_b], (0, 0, 255), self.line_thickness)
+                #        self.repetitive_pairs.append(pair)
+                #    self.repetitive_pairs.append(pair)
         else:
             part_a = tuple(pairs[0])
             part_b = tuple(pairs[1])
             import pudb; pu.db
             if is_correct_edge:
-                cv2.line(self.image, part_a, part_b, (0, 255, 255), self.line_thickness)
+                temp_img = cv2.line(self.image, part_a, part_b, (0, 255, 255), self.line_thickness)
+                self.save_image(temp_img, is_correct_edge, self.output_path, self.file_name + f'_{rule_name}' + '.JPG', rule_name, angle)
             else:
-                cv2.line(self.image, part_a, part_b, (0, 0, 255), self.line_thickness)
+                temp_img = cv2.line(self.image, part_a, part_b, (0, 0, 255), self.line_thickness)
+                self.save_image(temp_img, is_correct_edge, self.output_path, self.file_name + f'_{rule_name}' + '.JPG', rule_name, angle)
 
             
 
-    def save_image(self, is_correct_posture, output_directory, file_name):
-        img_copy = self.image.copy()
+    def save_image(self, image, is_correct_posture, output_directory, file_name, rule_name, angle):
+        img_copy = image.copy()
         img = np.array(img_copy)[:, :, ::-1]
         face_blur_provider = FaceBlurring()
         blured_image = face_blur_provider.blur_face(self.points, self.pose_detector.Nose, self.pose_detector.LEye,
@@ -649,10 +656,10 @@ class RosaRuleProvider:
         plt.imshow(blured_image)
         plt.axis('off')
         if is_correct_posture:
-            plt.text(10, 30, 'Correct', color='yellow', fontsize=14)
+            plt.text(10, 30, f'{rule_name}: {angle}', color='green', fontsize=14)
             plt.savefig(f'{output_directory}/correct_posture/{file_name}')
         else:
-            plt.text(10, 30, 'Incorrect', color='red', fontsize=14)
+            plt.text(10, 30, f'{rule_name}: {angle}', color='red', fontsize=14)
             plt.savefig(f'{output_directory}/incorrect_posture/{file_name}')
         plt.close()
 
