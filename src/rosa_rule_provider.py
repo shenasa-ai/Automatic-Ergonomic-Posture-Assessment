@@ -226,10 +226,10 @@ class RosaRuleProvider:
                     self.points[self.pose_detector.LShoulder] = self.points[self.pose_detector.RShoulder]
                 
                 # middle of shoulders (x coordinate)
-                MidHip = tuple((np.array(self.points[self.pose_detector.RHip]) + 
-                    np.array(self.points[self.pose_detector.LHip])/2).astype(int))
-                MidShoulder = tuple((np.array(self.points[self.pose_detector.RShoulder]) + 
-                    np.array(self.points[self.pose_detector.LShoulder])/2).astype(int))
+                MidHip = tuple(((np.array(self.points[self.pose_detector.RHip]) + 
+                    np.array(self.points[self.pose_detector.LHip]))/2).astype(int))
+                MidShoulder = tuple(((np.array(self.points[self.pose_detector.RShoulder]) + 
+                    np.array(self.points[self.pose_detector.LShoulder]))/2).astype(int))
 
                 import pudb; pu.db
                 mid_shoulder_hip_knee = self.get_mid_shoulder_hip_knee_angle(MidHip, MidShoulder)
@@ -240,18 +240,19 @@ class RosaRuleProvider:
                 if mid_shoulder_hip_knee:
                     if mid_shoulder_hip_knee < 95:
                         backrest_score = 2
+                        import pudb; pu.db
                         self.draw_lines_between_pairs(mid_shoulder_hip_knee_points, False, True)
                         self.description = self.description + f'Back rest is BENT FORWARD from right side - ' \
-                                                              f'right shoulder_hip_knee angle: {r_shoulder_hip_knee}\n'
+                                                              f'right shoulder_hip_knee angle: {mid_shoulder_hip_knee}\n'
                     elif mid_shoulder_hip_knee > 110:
                         backrest_score = 2
                         self.draw_lines_between_pairs(mid_shoulder_hip_knee_points, False, True) 
                         self.description = self.description + f'Back rest is BENT BACKWARD from right side - ' \
-                                                              f'right shoulder_hip_knee angle: {r_shoulder_hip_knee}\n'
+                                                              f'right shoulder_hip_knee angle: {mid_shoulder_hip_knee}\n'
                     else:
                         self.draw_lines_between_pairs(mid_shoulder_hip_knee_points, True, True)   
                         self.description = self.description + f'Back rest is NORMAL from right side - ' \
-                                                              f'right shoulder_hip_knee angle: {r_shoulder_hip_knee}\n'
+                                                              f'right shoulder_hip_knee angle: {mid_shoulder_hip_knee}\n'
 
                 #if l_shoulder_hip_knee:
                 #    if l_shoulder_hip_knee < 95:
@@ -578,11 +579,14 @@ class RosaRuleProvider:
 
     def draw_lines_between_pairs(self, pairs, is_correct_edge=True, is_point_pixel=False):
         import pudb; pu.db
-        for pair in pairs:
-            part_a = pair[0]
-            part_b = pair[1]
+        #for pair in pairs:
+        #    part_a = pair[0]
+        #    part_b = pair[1]
             
-            if is_point_pixel:
+        if not is_point_pixel:
+            for pair in pairs:
+                part_a = pair[0]
+                part_b = pair[1]
                 if self.points[part_a] and self.points[part_b]:
                     if pair in self.repetitive_pairs:
                         import pudb; pu.db
@@ -625,7 +629,16 @@ class RosaRuleProvider:
                             cv2.line(self.image, self.points[part_a], self.points[part_b], (0, 0, 255), self.line_thickness)
                         self.repetitive_pairs.append(pair)
                     self.repetitive_pairs.append(pair)
-                
+        else:
+            part_a = tuple(pairs[0])
+            part_b = tuple(pairs[1])
+            import pudb; pu.db
+            if is_correct_edge:
+                cv2.line(self.image, part_a, part_b, (0, 255, 255), self.line_thickness)
+            else:
+                cv2.line(self.image, part_a, part_b, (0, 0, 255), self.line_thickness)
+
+            
 
     def save_image(self, is_correct_posture, output_directory, file_name):
         img_copy = self.image.copy()
