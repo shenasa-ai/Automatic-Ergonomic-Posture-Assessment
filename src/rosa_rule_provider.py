@@ -43,19 +43,21 @@ class RosaRuleProvider:
         print(f'ROSA score is checking for {file_name} ...\n')
 
         if self.camera_view_point == "side":
-            # Chair Height & Pan Depth (3/7)
-            chair_score = self.get_chair_score()
+            ## Chair Height & Pan Depth (3/7)
+            #chair_score = self.get_chair_score()
 
-            # Backrest (2/5)
-            backrest_score = self.get_backrest_score()
+            ## Backrest (2/5)
+            #backrest_score = self.get_backrest_score()
 
-            # Monitor (0/6)
-            #monitor_score = self.get_monitor_score()
-            self.figure_side.savefig(f'{self.output_path}/{self.file_name}.JPG')
-            import pudb; pu.db
+            ## Monitor (0/6)
+            ##monitor_score = self.get_monitor_score()
+            #self.figure_side.savefig(f'{self.output_path}/{self.file_name}.JPG')
+            #import pudb; pu.db
+            pass
 
 
         else:
+            import pudb; pu.db
 
             # Armrest (3/4)
             armrest_score = self.get_armrest_score()
@@ -67,7 +69,7 @@ class RosaRuleProvider:
             #monitor_score = self.get_monitor_score()
 
             # Telephone (1/3)
-            phone_score = self.get_phone_score()
+            #phone_score = self.get_phone_score()
 
         #import pudb; pu.db
         if  (chair_score > 1 if chair_score else True)  or (armrest_score > 1 if armrest_score else True) or (backrest_score > 1 if backrest_score else True) or (monitor_score > 1 if monitor_score else True) or (phone_score > 1 if phone_score else True):
@@ -142,22 +144,34 @@ class RosaRuleProvider:
     def get_armrest_score(self):
         armrest_score = 1
         self.get_blure_image()
-        axis = self.axs_side[0]
+        axis = self.axs_front[0]
         self.axs_front[0].set_title('Armrest Score')
         self.axs_front[0].axis('off')
+        axis.imshow(self.blured_image)
 
-        if self.camera_view_point == "front":
+        if True: #self.camera_view_point == "front": ###################################################
             shoulders_neck_angle = self.get_shoulders_neck_angle()
-            shoulders_neck_points = [[self.pose_detector.Neck, self.pose_detector.RShoulder],
-                                     [self.pose_detector.Neck, self.pose_detector.LShoulder]]
+            shoulders_neck_points = [self.pose_detector.Neck, self.pose_detector.RShoulder, self.pose_detector.LShoulder]
             if shoulders_neck_angle:
                 if shoulders_neck_angle < 160:
                     armrest_score = 2
-                    self.draw_lines_between_pairs(shoulders_neck_points, False)
+                    c = 'red'
+                    #self.draw_lines_between_pairs(shoulders_neck_points, False)
                     self.description = self.description + f'Shoulders are SHRUGGED - shoulders_neck angle: {shoulders_neck_angle} \n'
                 else:
-                    self.draw_lines_between_pairs(shoulders_neck_points)
+                    c = 'green'
+                    #self.draw_lines_between_pairs(shoulders_neck_points)
                     self.description = self.description + f'Shoulders are in NORMAL POSTURE - shoulders_neck angle: {shoulders_neck_angle} \n'
+                self.draw_lines_between_pairs(axis, shoulders_neck_points, c)
+                self.put_text_add_description(self.output_path, self.file_name, 'Neck angle', shoulders_neck_angle, c, 10 , 60)
+            else:
+                print("Not Enough Info")
+                self.put_text_add_description(self.output_path, self.file_name, "Not Enough Info aboud sholders being shrogged ", None, 'red')
+            import pudb; pu.db
+
+
+
+
 
             r_shoulder_elbow_angle = None
             r_shoulder_elbow_points = [[self.pose_detector.RShoulder, self.pose_detector.RElbow]]
@@ -165,68 +179,77 @@ class RosaRuleProvider:
             l_shoulder_elbow_angle = None
             l_shoulder_elbow_points = [[self.pose_detector.LShoulder, self.pose_detector.LElbow]]
 
-            if self.points[self.pose_detector.RShoulder] and self.points[self.pose_detector.RElbow]:
-                r_shoulder_elbow_angle = self.get_angle_between_vector_and_vertical_axis(
-                    np.array(self.points[self.pose_detector.RElbow]) - np.array(self.points[self.pose_detector.RShoulder]))
+            if ((self.points[self.pose_detector.RShoulder] and self.points[self.pose_detector.RElbow]) or 
+                    (self.points[self.pose_detector.LShoulder] and self.points[self.pose_detector.LElbow])):
+                
+                if self.points[self.pose_detector.RShoulder] and self.points[self.pose_detector.RElbow]:
+                    r_shoulder_elbow_angle = self.get_angle_between_vector_and_vertical_axis(
+                        np.array(self.points[self.pose_detector.RElbow]) - np.array(self.points[self.pose_detector.RShoulder]))
 
-            if self.points[self.pose_detector.LShoulder] and self.points[self.pose_detector.LElbow]:
-                l_shoulder_elbow_angle = self.get_angle_between_vector_and_vertical_axis(
-                    np.array(self.points[self.pose_detector.LElbow]) - np.array(self.points[self.pose_detector.LShoulder]))
+                if self.points[self.pose_detector.LShoulder] and self.points[self.pose_detector.LElbow]:
+                    l_shoulder_elbow_angle = self.get_angle_between_vector_and_vertical_axis(
+                        np.array(self.points[self.pose_detector.LElbow]) - np.array(self.points[self.pose_detector.LShoulder]))
 
-            if r_shoulder_elbow_angle:
-                if r_shoulder_elbow_angle > 20:
-                    armrest_score += 1
-                    self.draw_lines_between_pairs(r_shoulder_elbow_points, False)
-                    self.description = self.description + f'Right elbow is NOT INLINE with right shoulder - ' \
-                                                          f'Angle between right shoulder_elbow and vertical axis: ' \
-                                                          f'{r_shoulder_elbow_angle}\n'
-                else:
-                    self.draw_lines_between_pairs(r_shoulder_elbow_points)
-                    self.description = self.description + f'Right elbow is INLINE with right shoulder - ' \
-                                                          f'Angle between right shoulder_elbow and vertical axis: ' \
-                                                          f'{r_shoulder_elbow_angle}\n'
+                if r_shoulder_elbow_angle:
+                    if r_shoulder_elbow_angle > 20:
+                        armrest_score += 1
+                        c = 'red'
+                        #self.draw_lines_between_pairs(r_shoulder_elbow_points, False)
+                        self.description = self.description + f'Right elbow is NOT INLINE with right shoulder - ' \
+                                                              f'Angle between right shoulder_elbow and vertical axis: ' \
+                                                              f'{r_shoulder_elbow_angle}\n'
+                    else:
+                        c = 'green'
+                        #self.draw_lines_between_pairs(r_shoulder_elbow_points)
+                        self.description = self.description + f'Right elbow is INLINE with right shoulder - ' \
+                                                              f'Angle between right shoulder_elbow and vertical axis: ' \
+                                                              f'{r_shoulder_elbow_angle}\n'
 
-            if l_shoulder_elbow_angle:
-                if l_shoulder_elbow_angle > 20:
-                    armrest_score += 1
-                    self.draw_lines_between_pairs(l_shoulder_elbow_points, False)
-                    self.description = self.description + f'Left elbow is NOT INLINE with left shoulder - ' \
-                                                          f'Angle between left shoulder_elbow and vertical axis:' \
-                                                          f' {l_shoulder_elbow_angle}\n'
-                else:
-                    self.draw_lines_between_pairs(l_shoulder_elbow_points)
-                    self.description = self.description + f'Left elbow is INLINE with left shoulder - ' \
-                                                          f'Angle between left shoulder_elbow and vertical axis: ' \
-                                                          f'{l_shoulder_elbow_angle}\n'
+                if l_shoulder_elbow_angle:
+                    if l_shoulder_elbow_angle > 20:
+                        armrest_score += 1
+                        self.draw_lines_between_pairs(l_shoulder_elbow_points, False)
+                        self.description = self.description + f'Left elbow is NOT INLINE with left shoulder - ' \
+                                                              f'Angle between left shoulder_elbow and vertical axis:' \
+                                                              f' {l_shoulder_elbow_angle}\n'
+                    else:
+                        self.draw_lines_between_pairs(l_shoulder_elbow_points)
+                        self.description = self.description + f'Left elbow is INLINE with left shoulder - ' \
+                                                              f'Angle between left shoulder_elbow and vertical axis: ' \
+                                                              f'{l_shoulder_elbow_angle}\n'
 
-            r_neck_shoulder_elbow = self.get_r_neck_shoulder_elbow_angle()
-            r_neck_shoulder_elbow_points = [[self.pose_detector.Neck, self.pose_detector.RShoulder],
-                                            [self.pose_detector.RShoulder, self.pose_detector.RElbow]]
-            l_neck_shoulder_elbow = self.get_l_neck_shoulder_elbow_angle()
-            l_neck_shoulder_elbow_points = [[self.pose_detector.Neck, self.pose_detector.LShoulder],
-                                            [self.pose_detector.LShoulder, self.pose_detector.LElbow]]
+                r_neck_shoulder_elbow = self.get_r_neck_shoulder_elbow_angle()
+                r_neck_shoulder_elbow_points = [[self.pose_detector.Neck, self.pose_detector.RShoulder],
+                                                [self.pose_detector.RShoulder, self.pose_detector.RElbow]]
+                l_neck_shoulder_elbow = self.get_l_neck_shoulder_elbow_angle()
+                l_neck_shoulder_elbow_points = [[self.pose_detector.Neck, self.pose_detector.LShoulder],
+                                                [self.pose_detector.LShoulder, self.pose_detector.LElbow]]
 
-            if r_neck_shoulder_elbow:
-                if r_neck_shoulder_elbow > 120:
-                    armrest_score += 1
-                    self.draw_lines_between_pairs(r_neck_shoulder_elbow_points, False)
-                    self.description = self.description + f'TOO WIDE right elbow - ' \
-                                                          f'right neck_shoulder_elbow angle: {r_neck_shoulder_elbow}\n'
-                else:
-                    self.draw_lines_between_pairs(r_neck_shoulder_elbow_points)
-                    self.description = self.description + f'Right elbow is NOT TOO WIDE - ' \
-                                                          f'right neck_shoulder_elbow angle: {r_neck_shoulder_elbow}\n'
+                if r_neck_shoulder_elbow:
+                    if r_neck_shoulder_elbow > 120:
+                        armrest_score += 1
+                        self.draw_lines_between_pairs(r_neck_shoulder_elbow_points, False)
+                        self.description = self.description + f'TOO WIDE right elbow - ' \
+                                                              f'right neck_shoulder_elbow angle: {r_neck_shoulder_elbow}\n'
+                    else:
+                        self.draw_lines_between_pairs(r_neck_shoulder_elbow_points)
+                        self.description = self.description + f'Right elbow is NOT TOO WIDE - ' \
+                                                              f'right neck_shoulder_elbow angle: {r_neck_shoulder_elbow}\n'
 
-            if l_neck_shoulder_elbow:
-                if l_neck_shoulder_elbow > 120:
-                    armrest_score += 1
-                    self.draw_lines_between_pairs(l_neck_shoulder_elbow_points, False)
-                    self.description = self.description + f'TOO WIDE left elbow - ' \
-                                                          f'left neck_shoulder_elbow angle: {l_neck_shoulder_elbow}\n'
-                else:
-                    self.draw_lines_between_pairs(l_neck_shoulder_elbow_points)
-                    self.description = self.description + f'Left elbow is NOT TOO WIDE - ' \
-                                                          f'left neck_shoulder_elbow angle: {l_neck_shoulder_elbow}\n'
+                if l_neck_shoulder_elbow:
+                    if l_neck_shoulder_elbow > 120:
+                        armrest_score += 1
+                        self.draw_lines_between_pairs(l_neck_shoulder_elbow_points, False)
+                        self.description = self.description + f'TOO WIDE left elbow - ' \
+                                                              f'left neck_shoulder_elbow angle: {l_neck_shoulder_elbow}\n'
+                    else:
+                        self.draw_lines_between_pairs(l_neck_shoulder_elbow_points)
+                        self.description = self.description + f'Left elbow is NOT TOO WIDE - ' \
+                                                              f'left neck_shoulder_elbow angle: {l_neck_shoulder_elbow}\n'
+            else:
+                print("Not Enough Info")
+                self.put_text_add_description(self.output_path, self.file_name, "Not Enough Info aboud sholders being wide", None, 'red')
+
         
         return armrest_score
 
