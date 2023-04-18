@@ -19,13 +19,10 @@ args = parser.parse_args()
 
 def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provider):
     for file in os.listdir(root_dir):
-        import pudb; pu.db
         file_name = os.fsdecode(file)
         #file_name = os.path.splitext(file_name)[0]
         image = cv2.imread(f'{root_dir}/{file_name}')
-        import pudb; pu.db
         #if file == '72.jpg':
-        #    import pudb; pu.db
         resized_image = pose_detector.preprocess_image(image)
         points = pose_detector.get_joint_points()
         position_status = rosa_rule_provider.get_posture_status(resized_image, points, file_name, camera_view_point, args.output_path)
