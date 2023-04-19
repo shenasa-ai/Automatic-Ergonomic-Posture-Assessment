@@ -8,3 +8,5 @@ joints/*
 input/*
 input_internet/*
 input_test/*
+renamed_input/*
+rename.py
