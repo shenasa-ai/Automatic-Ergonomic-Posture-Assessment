@@ -1,5 +1,8 @@
 import math
 import os
+import csv
+
+import pandas as pd
 import numpy as np
 from pose_detector import PoseDetector
 from matplotlib import pyplot as plt
@@ -19,7 +22,17 @@ class RosaRuleProvider:
         #self.repetitive_pairs = []
         self.camera_view_point = "front"
 
-    def get_posture_status(self, image, points, file_name, view_point, output_path, draw_joint_points=True):
+    def get_labels(self, file_name):
+        import pudb; pu.db
+        labels = dict()
+        with open(file_name, 'r') as file:
+            reader = csv.reader(file)
+            for i , row in enumerate(reader):
+                if i > 0:
+                    labels[row[0]] = list(map(lambda x: int(x), row[1:])) 
+        return labels
+
+    def get_posture_status(self, image, points, file_name, view_point, output_path, front_label_path, side_label_path, draw_joint_points=True):
         self.description = ""
         self.image = image
         self.points = points
@@ -30,18 +43,21 @@ class RosaRuleProvider:
             self.figure_front.tight_layout()
             armrest_score = 1
             phone_score = 1
+            self.labels = self.get_labels(front_label_path)
         else:
             self.figure_side, self.axs_side = plt.subplots(1, 3)
             self.figure_side.tight_layout()
             chair_score = 1
             backrest_score = 1
             monitor_score = 1
+            self.labels = self.get_labels(side_label_path)
         #mouse_score = 1
         posture_status = False
         self.file_name = os.path.splitext(file_name)[0]
         if draw_joint_points:
             self.display_joint_points(file_name)
 
+        import pudb; pu.db
         print(f'ROSA score is checking for {file_name} ...\n')
 
         if self.camera_view_point == "side":
@@ -127,6 +143,7 @@ class RosaRuleProvider:
                                        f'Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
                 self.draw_lines_between_pairs(axis, l_hip_knee_ankle_points, c)
                 self.put_text_add_description(axis, self.output_path, self.file_name, 'Left leg angle', l_hip_knee_ankle_angle, c, 10 , 60)
+                self.put_score_label(axis, 'chair', chair_score, self.labels[self.file_name][0])
         else:
             print("Not Enough Info")
             self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red')
@@ -590,3 +607,9 @@ class RosaRuleProvider:
         text_file.write(f'Description of {file_name}:\n{self.description}'
                         f'f"*************************************************************************\n')
         text_file.close()
+
+    def put_score_label(self, axis, rule, score, label, x=1):
+        import pudb; pu.db
+        axis.text(10 , int(self.image.shape[0] - 10 * x) , f'{rule} score: {score}')
+        axis.text(int(self.image.shape[1] - 50) , int(self.image.shape[0] - 10 * x) , f'label: {label}')
+    

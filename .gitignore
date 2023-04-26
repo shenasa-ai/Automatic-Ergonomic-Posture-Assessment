@@ -10,3 +10,8 @@ input_internet/*
 input_test/*
 renamed_input/*
 rename.py
+input_our/*
+side/*
+front_0.jpg
+temp/*
+output/openpose/*.txt
