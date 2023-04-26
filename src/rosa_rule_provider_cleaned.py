@@ -70,12 +70,6 @@ class RosaRuleProvider:
             self.figure_front.savefig(f'{self.output_path}/{self.file_name}.JPG')
             plt.close()
 
-        #import pudb; pu.db
-        #if  (chair_score > 1 if chair_score else True)  or (armrest_score > 1 if armrest_score else True) or (backrest_score > 1 if backrest_score else True) or (monitor_score > 1 if monitor_score else True) or (phone_score > 1 if phone_score else True):
-#       # armrest_score > 1 or backrest_score > 1 or monitor_score > 1 or phone_score > 1:
-        #    posture_status = False
-        #else:
-        #    posture_status = True
 
         if self.camera_view_point == 'side':
             print(f'chair score is: {chair_score}\n'
@@ -224,41 +218,6 @@ class RosaRuleProvider:
 
 
 
-        #        r_neck_shoulder_elbow = self.get_r_neck_shoulder_elbow_angle()
-        #        r_neck_shoulder_elbow_points = [[self.pose_detector.Neck, self.pose_detector.RShoulder],
-        #                                        [self.pose_detector.RShoulder, self.pose_detector.RElbow]]
-        #        l_neck_shoulder_elbow = self.get_l_neck_shoulder_elbow_angle()
-        #        l_neck_shoulder_elbow_points = [[self.pose_detector.Neck, self.pose_detector.LShoulder],
-        #                                        [self.pose_detector.LShoulder, self.pose_detector.LElbow]]
-
-        #        if r_neck_shoulder_elbow:
-        #            if r_neck_shoulder_elbow > 120:
-        #                armrest_score += 1
-        #                self.draw_lines_between_pairs(r_neck_shoulder_elbow_points, False)
-        #                self.description = self.description + f'TOO WIDE right elbow - ' \
-        #                                                      f'right neck_shoulder_elbow angle: {r_neck_shoulder_elbow}\n'
-        #            else:
-        #                self.draw_lines_between_pairs(r_neck_shoulder_elbow_points)
-        #                self.description = self.description + f'Right elbow is NOT TOO WIDE - ' \
-        #                                                      f'right neck_shoulder_elbow angle: {r_neck_shoulder_elbow}\n'
-
-        #        if l_neck_shoulder_elbow:
-        #            if l_neck_shoulder_elbow > 120:
-        #                armrest_score += 1
-        #                self.draw_lines_between_pairs(l_neck_shoulder_elbow_points, False)
-        #                self.description = self.description + f'TOO WIDE left elbow - ' \
-        #                                                      f'left neck_shoulder_elbow angle: {l_neck_shoulder_elbow}\n'
-        #            else:
-        #                self.draw_lines_between_pairs(l_neck_shoulder_elbow_points)
-        #                self.description = self.description + f'Left elbow is NOT TOO WIDE - ' \
-        #                                                      f'left neck_shoulder_elbow angle: {l_neck_shoulder_elbow}\n'
-        #    else:
-        #        print("Not Enough Info")
-        #        self.put_text_add_description(self.output_path, self.file_name, "Not Enough Info aboud sholders being wide", None, 'red')
-
-        #
-        #return armrest_score
-
     def get_backrest_score(self):
         self.get_blure_image()
         axis = self.axs_side[1]
@@ -318,14 +277,6 @@ class RosaRuleProvider:
         #import pudb; pu.db
         return backrest_score
         
-
-        
-        #if self.camera_view_point == "front":
-        #    shoulders_neck_angle = self.get_shoulders_neck_angle()
-        #    if shoulders_neck_angle:
-        #        if shoulders_neck_angle < 160:
-        #            backrest_score += 1
-        #return backrest_score
 
     def get_monitor_score(self):
         monitor_score = 1
@@ -391,64 +342,6 @@ class RosaRuleProvider:
         return monitor_score 
 
 
-
-
-
-            #r_ear_eye_shoulder_angle = self.get_r_ear_eye_shoulder_angle()
-            #r_ear_eye_shoulder_points = [[self.pose_detector.REye, self.pose_detector.REar],
-            #                             [self.pose_detector.REar, self.pose_detector.RShoulder]]
-            #if r_ear_eye_shoulder_angle:
-            #    if r_ear_eye_shoulder_angle < 75:
-            #        self.draw_lines_between_pairs(r_ear_eye_shoulder_points, False)
-            #        self.description = self.description + f'Neck is BENT DOWNWARD from side view - ' \
-            #                                              f'right ear_eye_shoulder angle: {r_ear_eye_shoulder_angle} \n'
-            #    elif r_ear_eye_shoulder_angle > 125:
-            #        self.draw_lines_between_pairs(r_ear_eye_shoulder_points, False)
-            #        self.description = self.description + f'Neck is BENT UPWARD from side view - ' \
-            #                                              f'right ear_eye_shoulder angle: {r_ear_eye_shoulder_angle} \n'
-
-            #l_ear_eye_shoulder_angle = self.get_l_ear_eye_shoulder_angle()
-            #l_ear_eye_shoulder_points = [[self.pose_detector.LEye, self.pose_detector.LEar],
-            #                             [self.pose_detector.LEar, self.pose_detector.LShoulder]]
-            #if l_ear_eye_shoulder_angle:
-            #    if l_ear_eye_shoulder_angle < 75:
-            #        self.draw_lines_between_pairs(l_ear_eye_shoulder_points, False)
-            #        self.description = self.description + f'Neck is BENT DOWNWARD from side view - ' \
-            #                                              f'left ear_eye_shoulder angle: {l_ear_eye_shoulder_angle} \n'
-            #    elif l_ear_eye_shoulder_angle > 125:
-            #        self.draw_lines_between_pairs(l_ear_eye_shoulder_points, False)
-            #        self.description = self.description + f'Neck is BENT UPWARD from side view - ' \
-            #                                              f'left ear_eye_shoulder angle: {l_ear_eye_shoulder_angle} \n'
-
-        #if self.camera_view_point == "front":
-        #    # neck rule front
-        #    if self.points[self.pose_detector.LEye] and self.points[self.pose_detector.REye] and \
-        #            self.points[self.pose_detector.LShoulder] and self.points[self.pose_detector.RShoulder]:
-        #        v1 = np.array(self.points[self.pose_detector.LEye]) - np.array(self.points[self.pose_detector.REye])
-        #        v2 = np.array(self.points[self.pose_detector.LShoulder]) - np.array(self.points[self.pose_detector.RShoulder])
-        #        angle_between_shoulders_and_eyes = self.get_angle_between_lines(v1, v2)
-        #        two_eyes_vertical_axis_angle = self.get_angle_between_vector_and_vertical_axis(
-        #            np.array(self.points[self.pose_detector.LEye]) - np.array(self.points[self.pose_detector.REye]))
-        #        two_shoulders_vertical_axis_angle = self.get_angle_between_vector_and_vertical_axis(
-        #            np.array(self.points[self.pose_detector.LShoulder]) - np.array(self.points[self.pose_detector.RShoulder]))
-        #        two_eyes_points = [[self.pose_detector.LEye, self.pose_detector.REye]]
-        #        two_shoulders_points = [[self.pose_detector.LShoulder, self.pose_detector.RShoulder]]
-        #        if math.fabs(two_eyes_vertical_axis_angle - two_shoulders_vertical_axis_angle) > 30:
-        #            if 30 < angle_between_shoulders_and_eyes < 90:
-        #                self.description = self.description + f'Neck is BENT LEFTWARD from front view - ' \
-        #                                                      f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
-        #            elif 120 < angle_between_shoulders_and_eyes < 150:
-        #                self.description = self.description + f'Neck is BENT RIGHTWARD from front view - ' \
-        #                                                      f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
-        #            self.draw_lines_between_pairs(two_eyes_points, False)
-        #            self.draw_lines_between_pairs(two_shoulders_points, False)
-        #        else:
-        #            self.description = self.description + f'Neck is not BENT RIGHTWARD or leftward - ' \
-        #                                                  f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
-        #            self.draw_lines_between_pairs(two_eyes_points)
-        #            self.draw_lines_between_pairs(two_shoulders_points)
-        #return monitor_score
-
     def get_phone_score(self):
         import pudb; pu.db
         phone_score = 1
@@ -458,24 +351,10 @@ class RosaRuleProvider:
         self.axs_front[1].axis('off')
         axis.imshow(self.blured_image)
 
-        #r_hip_shoulder_ear_angle = self.get_r_hip_shoulder_ear_angle()
-        #r_hip_shoulder_ear_points = [self.pose_detector.RHip, self.pose_detector.RShoulder, self.pose_detector.REar]
-        #l_hip_shoulder_ear_angle = self.get_l_hip_shoulder_ear_angle()
-        #l_hip_shoulder_ear_points = [self.pose_detector.LHip, self.pose_detector.LShoulder, self.pose_detector.LEar]
-
         #import pudb; pu.db
         angle_between_shoulders_and_eyes = self.get_angle_between_shoulders_and_eyes()
 
 
-        ##if self.points[self.pose_detector.LEye] and self.points[self.pose_detector.REye] and \
-        ##        self.points[self.pose_detector.LShoulder] and self.points[self.pose_detector.RShoulder]:
-        ##    v1 = np.array(self.points[self.pose_detector.LEye]) - np.array(self.points[self.pose_detector.REye])
-        ##    v2 = np.array(self.points[self.pose_detector.LShoulder]) - np.array(self.points[self.pose_detector.RShoulder])
-        ##    angle_between_shoulders_and_eyes = self.get_angle_between_lines(v1, v2)
-            #two_eyes_vertical_axis_angle = self.get_angle_between_vector_and_vertical_axis(
-            #    np.array(self.points[self.pose_detector.LEye]) - np.array(self.points[self.pose_detector.REye]))
-            #two_shoulders_vertical_axis_angle = self.get_angle_between_vector_and_vertical_axis(
-            #    np.array(self.points[self.pose_detector.LShoulder]) - np.array(self.points[self.pose_detector.RShoulder]))
         two_eyes_points = [self.pose_detector.LEye, self.pose_detector.REye]
         two_shoulders_points = [self.pose_detector.LShoulder, self.pose_detector.RShoulder]
         #    if math.fabs(two_eyes_vertical_axis_angle - two_shoulders_vertical_axis_angle) > 30:
@@ -488,8 +367,6 @@ class RosaRuleProvider:
                 c = 'red'
                 self.description = self.description + f'Neck is BENT RIGHTWARD from front view - ' \
                                                       f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
-            #self.draw_lines_between_pairs(two_eyes_points, False)
-            #self.draw_lines_between_pairs(two_shoulders_points, False)
             else:
                 c = 'green'
                 self.description = self.description + f'Neck is not BENT RIGHTWARD or leftward - ' \
@@ -506,48 +383,6 @@ class RosaRuleProvider:
             #return monitor_score
             
         import pudb; pu.db
-
-        #shoulders_distance = None
-        #wrists_distance = None
-        #wrists_horizontal_axis_angle = None
-        #two_wrists_points = [self.pose_detector.LWrist, self.pose_detector.RWrist]
-
-        #if self.camera_view_point == "front":
-        #if self.points[self.pose_detector.RShoulder] and self.points[self.pose_detector.LShoulder]:
-        #    shoulders_distance = self.calculate_distance_between_two_points(self.points[self.pose_detector.RShoulder],
-        #                                                                    self.points[self.pose_detector.LShoulder])
-
-        #if self.points[self.pose_detector.RWrist] and self.points[self.pose_detector.LWrist]:
-        #    wrists_distance = self.calculate_distance_between_two_points(self.points[self.pose_detector.RWrist],
-        #                                                                 self.points[self.pose_detector.LWrist])
-        #   # wrists_horizontal_axis_angle = self.get_angle_between_vector_and_horizontal_axis(
-        #   #     np.array(self.points[self.pose_detector.RWrist]) - np.array(self.points[self.pose_detector.LWrist])
-        #   # )
-
-        #if (shoulders_distance and wrists_distance): # or wrists_horizontal_axis_angle:
-        #    if math.fabs(wrists_distance - shoulders_distance) > shoulders_distance / 3:
-        #        phone_score = 2
-        #        self.description = self.description + 'TOO WIDE wrists\n'
-        #        self.draw_lines_between_pairs(two_wrists_points, False)
-        #    if wrists_horizontal_axis_angle:
-        #        if wrists_horizontal_axis_angle > 10:
-        #            phone_score += 1
-        #            self.description = self.description + 'Two wrists  are NOT ON THE SAME SURFACE\n'
-        #            self.draw_lines_between_pairs(two_wrists_points, False)
-
-            #if self.points[self.pose_detector.Neck] and self.points[self.pose_detector.Nose]:
-            #    neck_nose_points = [[self.pose_detector.Neck, self.pose_detector.Nose]]
-            #    neck_nose_angle = self.get_angle_between_vector_and_vertical_axis(
-            #        np.array(self.points[self.pose_detector.Neck]) - np.array(self.points[self.pose_detector.Nose]))
-            #    if neck_nose_angle:
-            #        if neck_nose_angle > 30:
-            #            self.description = self.description + f'Neck is BENT - ' \
-            #                                                  f'angle between neck_nose and vertical axis: {neck_nose_angle}\n'
-            #            self.draw_lines_between_pairs(neck_nose_points, False)
-            #        else:
-            #            self.description = self.description + f'Neck is NORMAL - ' \
-            #                                                  f'angle between neck_nose and vertical axis: {neck_nose_angle}\n'
-            #            self.draw_lines_between_pairs(neck_nose_points)
 
         return phone_score
 
