@@ -1,7 +1,7 @@
 import math
 import os
 import numpy as np
-from src.pose_detector import PoseDetector
+from pose_detector import PoseDetector
 from matplotlib import pyplot as plt
 from face_blurring import FaceBlurring
 import cv2
@@ -567,10 +567,10 @@ class RosaRuleProvider:
         plt.imshow(blured_image)
         plt.axis('off')
         if is_correct_posture:
-            plt.text(10, 30, 'Correct', color='yellow', fontsize=14)
+            plt.text(10, 30, 'Healthy', color='yellow', fontsize=14)
             plt.savefig(f'{output_directory}/correct_posture/{file_name}')
         else:
-            plt.text(10, 30, 'Incorrect', color='red', fontsize=14)
+            plt.text(10, 30, 'Unhealthy', color='red', fontsize=14)
             plt.savefig(f'{output_directory}/incorrect_posture/{file_name}')
         plt.close()
 
