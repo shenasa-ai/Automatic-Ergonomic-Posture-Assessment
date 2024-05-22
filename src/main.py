@@ -10,7 +10,7 @@ from rosa_rule_provider import RosaRuleProvider
 deep_model = "openpose"
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--input_path', default='/home/ali/Desktop/python/posture/input', help='path to input directory')
+parser.add_argument('--input_path', default='/home/ali/Desktop/python/posture/input/front', help='path to input directory')
 parser.add_argument('--output_path', default=f'../output/{deep_model}', help='path to output directory')
 parser.add_argument('--frame_rate', default=10, help='video frame rate')
 
