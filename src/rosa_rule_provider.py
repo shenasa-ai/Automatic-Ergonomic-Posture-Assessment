@@ -17,8 +17,10 @@ class RosaRuleProvider:
         self.description = ""
         self.repetitive_pairs = []
         self.camera_view_point = "front"
+        self.threshold = {'filename': [], 'modeldete': [], 'angle': []}
 
     def get_posture_status(self, image, points, file_name, view_point, draw_joint_points=True):
+        self.threshold['filename'].append(file_name)
         self.description = ""
         self.image = image
         self.points = points
@@ -37,23 +39,25 @@ class RosaRuleProvider:
         print(f'ROSA score is checking for {file_name} ...\n')
 
         # Chair Height & Pan Depth (3/7)
-        chair_score = self.get_chair_score()
+        # chair_score = self.get_chair_score()
 
         # Armrest (3/4)
-        armrest_score = self.get_armrest_score()
+        # armrest_score = self.get_armrest_score()
 
         # Backrest (3/5)
         backrest_score = self.get_backrest_score()
 
         # Monitor (0/6)
-        monitor_score = self.get_monitor_score()
+        # monitor_score = self.get_monitor_score()
 
         # Telephone (1/3)
-        phone_score = self.get_phone_score()
+        # phone_score = self.get_phone_score()
 
         if chair_score > 1 or armrest_score > 1 or backrest_score > 1 or monitor_score > 1 or phone_score > 1:
+            self.threshold['modeldete'].append('unhealthy')
             posture_status = False
         else:
+            self.threshold['modeldete'].append('healthy')
             posture_status = True
 
         print(f'chair score is: {chair_score}\n'
@@ -216,7 +220,9 @@ class RosaRuleProvider:
     def get_backrest_score(self):
         backrest_score = 1
         if self.camera_view_point == "side":
-            r_shoulder_hip_knee = self.get_r_shoulder_hip_knee_angle()
+            # *r_shoulder_hip_knee was commented for threshold optimizing*
+            # r_shoulder_hip_knee = self.get_r_shoulder_hip_knee_angle()
+            r_shoulder_hip_knee = None
             r_shoulder_hip_knee_points = [[self.pose_detector.RShoulder, self.pose_detector.RHip],
                                           [self.pose_detector.RHip, self.pose_detector.RKnee]]
             l_shoulder_hip_knee = self.get_l_shoulder_hip_knee_angle()
@@ -258,7 +264,10 @@ class RosaRuleProvider:
                     self.draw_lines_between_pairs(l_shoulder_hip_knee_points)
                     self.description = self.description + f'Back rest is NORMAL from left side - ' \
                                                           f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
+                self.threshold['angle'].append(l_shoulder_hip_knee)
                 self.draw_angles(l_shoulder_hip_knee_points, l_shoulder_hip_knee, healthy)
+            else:
+                self.threshold['angle'].append('null')
 
         if self.camera_view_point == "front":
             shoulders_neck_angle = self.get_shoulders_neck_angle()
@@ -654,3 +663,5 @@ class RosaRuleProvider:
                 cv2.putText(self.image, f"{angle}",
                             (self.points[in_common_element][0], self.points[in_common_element][1]),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)  # color : yellow
+
+
