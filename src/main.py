@@ -11,7 +11,8 @@ from rosa_rule_provider import RosaRuleProvider
 deep_model = "openpose"
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--input_path', default='/home/ali/Desktop/python/posture/input/side', help='path to input directory')
+parser.add_argument('--input_path', default='/home/ali/Desktop/python/posture/input/side',
+                    help='path to input directory')
 parser.add_argument('--output_path', default=f'../report_threshold/backrest/{deep_model}',
                     help='path to output directory')
 parser.add_argument('--frame_rate', default=10, help='video frame rate')
@@ -28,10 +29,6 @@ def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provide
         position_status = rosa_rule_provider.get_posture_status(resized_image, points, file_name, camera_view_point)
         rosa_rule_provider.save_image(position_status, args.output_path, file_name)
         print('*******************************************************************************************')
-    # convert rosa_rule_provider.threshold to csv file
-    df = pd.DataFrame.from_dict(rosa_rule_provider.threshold, orient='index')
-    df = df.transpose()
-    df.to_csv('/home/ali/Desktop/python/posture/Automatic-Ergonomic-Posture-Assessment/report_threshold/backrest/openpose/backrest_report.csv', index=False)
 
 
 def main():
