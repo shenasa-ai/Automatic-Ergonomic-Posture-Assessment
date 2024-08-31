@@ -213,7 +213,7 @@ class RosaRuleProvider:
 
         return armrest_score
 
-    def get_backrest_score(self):
+    def     get_backrest_score(self):
         backrest_score = 1
         if self.camera_view_point == "side":
             # *r_shoulder_hip_knee was commented for threshold optimizing*
