@@ -213,7 +213,7 @@ class RosaRuleProvider:
 
         return armrest_score
 
-    def     get_backrest_score(self):
+    def get_backrest_score(self):
         backrest_score = 1
         if self.camera_view_point == "side":
             # *r_shoulder_hip_knee was commented for threshold optimizing*
@@ -256,10 +256,17 @@ class RosaRuleProvider:
                     self.description = self.description + f'Back rest is BENT BACKWARD from left side - ' \
                                                           f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
                 else:
-                    healthy = True
+                    if self.check_back_validation():
+                        healthy = True
+                        self.description = self.description + f'Back rest is NORMAL from left side - ' \
+                                                              f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
+                    else:
+                        healthy = False
+                        backrest_score = 2
+                        self.description = self.description + f'Back rest is BENT FORWARD from left side OR Back rest is BENT BACKWARD from left side - ' \
+                                                              f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
                     self.draw_lines_between_pairs(l_shoulder_hip_knee_points)
-                    self.description = self.description + f'Back rest is NORMAL from left side - ' \
-                                                          f'left shoulder_hip_knee angle: {l_shoulder_hip_knee}\n'
+
                 self.draw_angles(l_shoulder_hip_knee_points, l_shoulder_hip_knee, healthy)
 
         if self.camera_view_point == "front":
@@ -268,6 +275,16 @@ class RosaRuleProvider:
                 if shoulders_neck_angle < 160:
                     backrest_score += 1
         return backrest_score
+
+    def check_back_validation(self):
+        virtual_joint = (self.points[self.pose_detector.LHip][0],
+                         self.points[self.pose_detector.LShoulder][1])  # x comes from hip and y comes from shoulder
+        angle = self.get_angle_between_points(self.points[self.pose_detector.LShoulder],
+                                              self.points[self.pose_detector.LHip], virtual_joint)
+        if angle:
+            if angle > 8:
+                return False
+        return True
 
     def get_monitor_score(self):
         monitor_score = 1
@@ -656,5 +673,3 @@ class RosaRuleProvider:
                 cv2.putText(self.image, f"{angle}",
                             (self.points[in_common_element][0], self.points[in_common_element][1]),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)  # color : yellow
-
-
