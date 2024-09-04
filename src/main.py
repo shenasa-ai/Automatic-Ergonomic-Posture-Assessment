@@ -1,17 +1,21 @@
 import argparse
 import os
 import cv2
-from src.pose_detector import PoseDetector
-from src.openpose_detector import OpenPoseDetector
-from src.mediapipe_pose_detector import MediapipePoseDetector
-from src.openpifpaf_pose_detector import OpenpifpafPoseDetector
-from src.rosa_rule_provider import RosaRuleProvider
+import pandas as pd
+from pose_detector import PoseDetector
+from openpose_detector import OpenPoseDetector
+from mediapipe_pose_detector import MediapipePoseDetector
+from openpifpaf_pose_detector import OpenpifpafPoseDetector
+from yolo_pose_detector import YoloPoseDetector
+from rosa_rule_provider import RosaRuleProvider
 
-deep_model = "openpose"
+deep_model = "Yolo"
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--input_path', default='../input', help='path to input directory')
-parser.add_argument('--output_path', default=f'../output/{deep_model}', help='path to output directory')
+parser.add_argument('--input_path', default='/home/ali/Desktop/python/posture/input/side',
+                    help='path to input directory')
+parser.add_argument('--output_path', default=f'../report_threshold/backrest/{deep_model}',
+                    help='path to output directory')
 parser.add_argument('--frame_rate', default=10, help='video frame rate')
 
 args = parser.parse_args()
@@ -39,6 +43,8 @@ def main():
         pose_detector = OpenpifpafPoseDetector()
     elif deep_model == "Mediapipe":
         pose_detector = MediapipePoseDetector()
+    elif deep_model == "Yolo":
+        pose_detector = YoloPoseDetector()
     rosa_rule_provider = RosaRuleProvider(pose_detector)
     if os.path.exists(f'{args.output_path}/log.txt'):
         os.remove(f'{args.output_path}/log.txt')
