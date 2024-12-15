@@ -9,7 +9,7 @@ from openpifpaf_pose_detector import OpenpifpafPoseDetector
 from yolo_pose_detector import YoloPoseDetector
 from rosa_rule_provider import RosaRuleProvider
 
-deep_model = "Yolo"
+deep_model = "Openpifpaf"
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_path', default='/home/ali/Desktop/python/posture/input/side',
@@ -21,7 +21,7 @@ parser.add_argument('--frame_rate', default=10, help='video frame rate')
 args = parser.parse_args()
 
 
-def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provider):
+def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provider, output_path):
     for file in os.listdir(root_dir):
         file_name = os.fsdecode(file)
         image = cv2.imread(f'{root_dir}/{file_name}')
@@ -30,11 +30,13 @@ def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provide
         position_status = rosa_rule_provider.get_posture_status(resized_image, points, file_name, camera_view_point)
         rosa_rule_provider.save_image(position_status, args.output_path, file_name)
         print('*******************************************************************************************')
+    prediction = pd.DataFrame(RosaRuleProvider.prediction)
+    prediction.to_csv(f'{output_path}/pred_{camera_view_point}_labels_{deep_model}.csv', index=False)
 
 
 def main():
     os.makedirs(args.output_path, exist_ok=True)
-
+    output_path = '.'
     input_directory = os.fsencode(args.input_path).decode("utf-8")
     pose_detector = None
     if deep_model == "openpose":
@@ -51,9 +53,9 @@ def main():
     sub_dirs = [x[0] for x in os.walk(input_directory)]
     for subdir in sub_dirs:
         if 'side' in subdir:
-            assess_posture(subdir, 'side', pose_detector, rosa_rule_provider)
+            assess_posture(subdir, 'side', pose_detector, rosa_rule_provider, output_path)
         elif 'front' in subdir:
-            assess_posture(subdir, 'front', pose_detector, rosa_rule_provider)
+            assess_posture(subdir, 'front', pose_detector, rosa_rule_provider, output_path)
 
 
 if __name__ == '__main__':

@@ -8,6 +8,15 @@ import cv2
 
 
 class RosaRuleProvider:
+    prediction = {
+        'image_number': [],
+        'chair': [],
+        'armrest': [],
+        'back': [],
+        'monitor': [],
+        'phone': []
+    }
+
     def __init__(self, pose_detector):
         self.image = None
         self.points = None
@@ -19,6 +28,7 @@ class RosaRuleProvider:
         self.camera_view_point = "front"
 
     def get_posture_status(self, image, points, file_name, view_point, draw_joint_points=True):
+        self.prediction['image_number'].append(file_name.split(sep='.')[0].split(sep='_')[1])
         self.description = ""
         self.image = image
         self.points = points
@@ -37,19 +47,24 @@ class RosaRuleProvider:
         print(f'ROSA score is checking for {file_name} ...\n')
 
         # Chair Height & Pan Depth (3/7)
-        # chair_score = self.get_chair_score()
+        chair_score = self.get_chair_score()
+        self.prediction['chair'].append(chair_score)
 
         # Armrest (3/4)
-        # armrest_score = self.get_armrest_score()
+        armrest_score = self.get_armrest_score()
+        self.prediction['armrest'].append(armrest_score)
 
         # Backrest (3/5)
         backrest_score = self.get_backrest_score()
+        self.prediction['back'].append(backrest_score)
 
         # Monitor (0/6)
-        # monitor_score = self.get_monitor_score()
+        monitor_score = self.get_monitor_score()
+        self.prediction['monitor'].append(monitor_score)
 
         # Telephone (1/3)
-        # phone_score = self.get_phone_score()
+        phone_score = self.get_phone_score()
+        self.prediction['phone'].append(phone_score)
 
         if chair_score > 1 or armrest_score > 1 or backrest_score > 1 or monitor_score > 1 or phone_score > 1:
             posture_status = False
