@@ -11,8 +11,7 @@ class FaceBlurring:
             input_list[1] = round(input_list[1])
             return tuple(input_list)
 
-    def blur_face(self, pointss, nose_idx, l_eye_idx, r_eye_idx, l_ear_idx, r_ear_idx, pil_im):
-        points = pointss.copy()
+    def blur_face(self, points, nose_idx, l_eye_idx, r_eye_idx, l_ear_idx, r_ear_idx, pil_im):
         image = np.array(pil_im)
         # adding a condition for checking if any point has not been detected exit the loop
         if (((points[r_eye_idx] or points[l_ear_idx]) or
