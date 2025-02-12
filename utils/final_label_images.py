@@ -78,7 +78,7 @@ def finalize_image_labels(
 
     # Save final labels to CSV
     sorted_data = pd.DataFrame(results)
-    sorted_data.to_csv(f'{save_path}/final_labels.csv', index=False)
+    sorted_data.to_csv(save_path, index=False)
 
     # Remove images without consistent labeling
     if rem_img:

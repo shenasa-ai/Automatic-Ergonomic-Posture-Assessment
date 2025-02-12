@@ -45,5 +45,5 @@ def clean_labels(
     labels.drop(index=must_drop, inplace=True)
 
     # Save the cleaned labels to a new CSV file
-    labels.to_csv(f'{save_path}/final_labels_cleared.csv', index=False)
+    labels.to_csv(save_path, index=False)
     print(f"Cleaned labels saved to {save_path}")

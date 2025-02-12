@@ -8,7 +8,8 @@ def calculate_accuracy(
     actual_path: str,
     pred_part: Optional[str] = None,
     actual_part: Optional[str] = None,
-    exclude_images=None
+    exclude_images=None,
+    error_analys=True
 ) -> float:
     """
     Calculate the accuracy between predicted and actual labels.
@@ -45,6 +46,16 @@ def calculate_accuracy(
         actual_df = actual_df[~actual_df['image_number'].isin(exclude_images)]
         if exclude_images:
             print(f'{exclude_images} Did not consider in result calculations')
+
+    if error_analys:
+        pred_series = pred_df[pred_part].reset_index(drop=True)
+        actual_series = actual_df[actual_part].reset_index(drop=True)
+        mismatches = actual_series[actual_series != pred_series].index.tolist()
+        for img in mismatches:
+            img_nmbr = actual_df['image_number'].iloc[img]  # Ensure we use iloc to access by position
+            print(img_nmbr)
+        pass
+
 
     # Calculate accuracy
     if pred_part is None and actual_part is None:
