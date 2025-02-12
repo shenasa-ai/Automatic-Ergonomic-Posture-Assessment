@@ -15,7 +15,11 @@ class RuleProvider:
     result = {
         'image_number': [],
         'back': [],
-        'monitor': []
+        'back_angle': [],
+        'chair': [],
+        'chair_angle': [],
+        'monitor': [],
+        'monitor_angle': []
     }
     def __init__(self, pose_detector):
         self.image = None
@@ -71,10 +75,12 @@ class RuleProvider:
         if self.camera_view_point == "side":
             # Chair Height & Pan Depth (3/7)
             chair_score = self.get_chair_score()
+            self.result['chair'].append(chair_score)
 
             # Backrest (2/5)
             backrest_score = self.get_backrest_score()
             self.result['back'].append(backrest_score)
+
 
             # Monitor (0/6)
             monitor_score = self.get_monitor_score()
@@ -122,69 +128,69 @@ class RuleProvider:
         r_hip_knee_ankle_angle = self.get_r_hip_knee_ankle_angle()
         l_hip_knee_ankle_angle = self.get_l_hip_knee_ankle_angle()
 
-        if r_hip_knee_ankle_angle or l_hip_knee_ankle_angle:
-            if r_hip_knee_ankle_angle:
-                r_hip_knee_ankle_points = [self.pose_detector.RHip, self.pose_detector.RKnee, self.pose_detector.RAnkle]
-                diff_x_rknee_rhip = self.points[self.pose_detector.RKnee][0] - self.points[self.pose_detector.RHip][0]
-                #import pudb; pu.db
-                if r_hip_knee_ankle_angle < (86 - self.th):
-                    r_chair_score = 2
-                    c = 'red'
-                    self.description = self.description + f'Right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
-                elif r_hip_knee_ankle_angle > (104 + self.th):
-                    r_chair_score = 2
-                    c = 'red'
-                    self.description = self.description + f'Right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
-                else:
-                    c = 'green'
-                    r_chair_score = 1
-                    self.description = self.description + \
-                                       f'Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
-                self.draw_lines_between_pairs(axis, r_hip_knee_ankle_points, c)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'Right leg angle', r_hip_knee_ankle_angle, c)
-
-            if l_hip_knee_ankle_angle:
-                l_hip_knee_ankle_points = [self.pose_detector.LHip, self.pose_detector.LKnee, self.pose_detector.LAnkle]
-                diff_x_lknee_lhip = self.points[self.pose_detector.LKnee][0] - self.points[self.pose_detector.LHip][0]
-                if l_hip_knee_ankle_angle < (86 - self.th):
-                    l_chair_score = 2
-                    c = 'red'
-                    self.description = self.description + f'Left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
-                elif l_hip_knee_ankle_angle > (104 + self.th):
-                    l_chair_score = 2
-                    c = 'red'
-                    self.description = self.description + f'Left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
-                else:
-                    c = 'green'
-                    l_chair_score = 1
-                    self.description = self.description + \
-                                       f'Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
-                self.draw_lines_between_pairs(axis, l_hip_knee_ankle_points, c)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'Left leg angle', l_hip_knee_ankle_angle, c, 10 , 60)
-                #import pudb; pu.db
-            if r_hip_knee_ankle_angle and l_hip_knee_ankle_angle:
-                # Condition 1: Front Leg
-                if diff_x_lknee_lhip > 0:
-                    chair_score = r_chair_score
-                else:
-                    chair_score = l_chair_score
-                ## Condition 2: Worst Case
-                #chair_score = max(r_chair_score, l_chair_score)
-            elif r_hip_knee_ankle_angle:
-                chair_score = r_chair_score
+        # if r_hip_knee_ankle_angle or l_hip_knee_ankle_angle:
+        #     if r_hip_knee_ankle_angle:
+        #         r_hip_knee_ankle_points = [self.pose_detector.RHip, self.pose_detector.RKnee, self.pose_detector.RAnkle]
+        #         diff_x_rknee_rhip = self.points[self.pose_detector.RKnee][0] - self.points[self.pose_detector.RHip][0]
+        #         #import pudb; pu.db
+        #         if r_hip_knee_ankle_angle < (86 - self.th):
+        #             r_chair_score = 2
+        #             c = 'red'
+        #             self.description = self.description + f'Right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
+        #         elif r_hip_knee_ankle_angle > (104 + self.th):
+        #             r_chair_score = 2
+        #             c = 'red'
+        #             self.description = self.description + f'Right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
+        #         else:
+        #             c = 'green'
+        #             r_chair_score = 1
+        #             self.description = self.description + \
+        #                                f'Right knee status is in CORRECT POSTURE - right hip_knee_ankle angle: {r_hip_knee_ankle_angle}\n'
+        #         self.draw_lines_between_pairs(axis, r_hip_knee_ankle_points, c)
+        #         self.put_text_add_description(axis, self.output_path, self.file_name, 'Right leg angle', r_hip_knee_ankle_angle, c)
+        l_chair_score = None
+        if l_hip_knee_ankle_angle:
+            l_hip_knee_ankle_points = [self.pose_detector.LHip, self.pose_detector.LKnee, self.pose_detector.LAnkle]
+            diff_x_lknee_lhip = self.points[self.pose_detector.LKnee][0] - self.points[self.pose_detector.LHip][0]
+            if l_hip_knee_ankle_angle < (86 - 6):
+                l_chair_score = 2
+                c = 'red'
+                self.description = self.description + f'Left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
+            elif l_hip_knee_ankle_angle > (104 + 0):
+                l_chair_score = 2
+                c = 'red'
+                self.description = self.description + f'Left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
             else:
-                chair_score = l_chair_score
-
-
-            self.put_score_label(axis, 'chair', chair_score, self.labels[self.file_name][0])
-
+                c = 'green'
+                l_chair_score = 1
+                self.description = self.description + \
+                                   f'Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
+            self.draw_lines_between_pairs(axis, l_hip_knee_ankle_points, c)
+            self.put_text_add_description(axis, self.output_path, self.file_name, 'Left leg angle', l_hip_knee_ankle_angle, c, 10 , 60)
+                #import pudb; pu.db
+            # if r_hip_knee_ankle_angle and l_hip_knee_ankle_angle:
+            #     # Condition 1: Front Leg
+            #     if diff_x_lknee_lhip > 0:
+            #         chair_score = r_chair_score
+            #     else:
+            #         chair_score = l_chair_score
+            #     ## Condition 2: Worst Case
+            #     #chair_score = max(r_chair_score, l_chair_score)
+            # elif r_hip_knee_ankle_angle:
+            #     chair_score = r_chair_score
+            # else:
+            #     chair_score = l_chair_score
+            #
+            #
+            # self.put_score_label(axis, 'chair', chair_score, self.labels[self.file_name][0])
         else:
             print("Not Enough Info")
             self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red')
             chair_score = None
         #import pudb; pu.db
         #axis.imshow(self.resize(self.blured_image))
-        return chair_score
+        self.result['chair_angle'].append(l_hip_knee_ankle_angle)
+        return l_chair_score
 
     def get_arm_score(self):
         arm_score = 1
@@ -274,7 +280,7 @@ class RuleProvider:
         #axis.imshow(self.blured_image)
         axis.imshow(self.resize(self.blured_image))
         backrest_score = 1
-
+        mid_shoulder_hip_knee = None
         if (((self.points[self.pose_detector.LHip] is not None) and 
                 (self.points[self.pose_detector.LShoulder] is not None)) or
                 ((self.points[self.pose_detector.RHip] is not None) and
@@ -326,6 +332,7 @@ class RuleProvider:
             backrest_score = None
         #import pudb; pu.db
         #axis.imshow(self.blured_image)
+        self.result['back_angle'].append(mid_shoulder_hip_knee)
         return backrest_score
         
 
@@ -368,7 +375,7 @@ class RuleProvider:
             #     self.put_text_add_description(axis, self.output_path, self.file_name, 'neck angle', r_hip_shoulder_ear_angle, c)
 
             if l_hip_shoulder_ear_angle:
-                if l_hip_shoulder_ear_angle < 150 - 10:
+                if l_hip_shoulder_ear_angle < 150 - 15:
                     monitor_score = 2
                     c = 'red'
                     #self.draw_lines_between_pairs(l_hip_shoulder_ear_points, False)
@@ -396,6 +403,7 @@ class RuleProvider:
         
         #import pudb; pu.db
         #axis.imshow(self.resize(self.blured_image))
+        self.result['monitor_angle'].append(l_hip_shoulder_ear_angle)
         return monitor_score 
 
 
