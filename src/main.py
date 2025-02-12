@@ -40,7 +40,7 @@ def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provide
 def main():
     os.makedirs(args.output_path, exist_ok=True)
 
-    input_directory = os.fsencode(args.input_path).decode("utf-8")
+    input_directory =   os.fsencode(args.input_path).decode("utf-8")
     pose_detector = None
     if deep_model == "openpose":
         pose_detector = OpenPoseDetector()
