@@ -35,7 +35,7 @@ def calculate_accuracy(
         raise ValueError("The 'image_number' columns in predicted and actual data do not match.")
 
     # find Null indices if exist
-    null_indices = pred_df[pred_df[actual_part].isnull().values.tolist()]['image_number'].values
+    null_indices = pred_df[pred_df[pred_part].isnull().values.tolist()]['image_number'].values
 
     if null_indices is not None:
         exclude_images.extend(null_indices)
