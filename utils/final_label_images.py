@@ -57,16 +57,23 @@ def finalize_image_labels(
         print('All pictures are consistently labeled.')
 
     # Combine ratings for each category
-    categories = ['chair 1-2', 'back support', 'monitor']
+    categories = columns[1:] # 0 place is for file name that we dont need that
     combined_data = {cat: pd.concat([df[cat] for df in labels], axis=1).to_numpy() for cat in categories}
 
     # Prepare results dictionary
-    results = {
-        'image_number': list(set(image_numbers)),
-        'chair': [], 'chair_rates': [],
-        'back': [], 'back_rates': [],
-        'monitor': [], 'monitor_rates': []
-    }
+    results = {'image_number': list(set(image_numbers))}
+    for c in columns:
+        if c == 'file name':
+            continue
+        results[c] = []
+        results[f'{c}_rates'] = []
+
+    # results = {
+    #     'image_number': list(set(image_numbers)),
+    #     'chair': [], 'chair_rates': [],
+    #     'back': [], 'back_rates': [],
+    #     'monitor': [], 'monitor_rates': []
+    # }
 
     # Calculate Fleiss' Kappa and populate results
     for i, (cat, data) in enumerate(combined_data.items()):
