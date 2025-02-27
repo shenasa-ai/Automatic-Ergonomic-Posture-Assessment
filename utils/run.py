@@ -33,4 +33,5 @@ print(calculate_accuracy(pred_part='trunck', actual_part='trunck',
 
 df = make_ready4plot(pred_path=pred_path, act_path=actual_path, part='trunck')
 #
-plot_data_distribution(df=df, data_col='trunck_angle_l', value_col='trunck_angle_r', label_col='trunck')
+plot_data_distribution(df=df, data_col='trunck_angle_l', value_col='trunck_angle_r', z_col='image_number',
+                       label_col='trunck')
