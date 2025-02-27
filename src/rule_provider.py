@@ -19,8 +19,17 @@ class RuleProvider:
         'chair': [],
         'chair_angle': [],
         'monitor': [],
-        'monitor_angle': []
+        'monitor_angle': [],
+        'neck': [],
+        'neck_angle': [],
+        'arm': [],
+        'arm_angle_r': [],
+        'arm_angle_l': [],
+        'trunck': [],
+        'trunck_angle_r': [],
+        'trunck_angle_l': []
     }
+
     def __init__(self, pose_detector):
         self.image = None
         self.points = None
@@ -28,21 +37,22 @@ class RuleProvider:
         self.circle_radius = 3
         self.line_thickness = 2
         self.description = ""
-        #self.repetitive_pairs = []
+        # self.repetitive_pairs = []
         self.camera_view_point = "front"
-        self.th = 0 
-        self.resize_factor= 1 
+        self.th = 0
+        self.resize_factor = 1
 
     def get_labels(self, file_name):
         labels = dict()
         with open(file_name, 'r') as file:
             reader = csv.reader(file)
-            for i , row in enumerate(reader):
+            for i, row in enumerate(reader):
                 if i > 0:
                     labels[row[0]] = list(map(lambda x: int(x), row[1:]))
         return labels
 
-    def get_posture_status(self, image, points, file_name, view_point, output_path, front_label_path, side_label_path, draw_joint_points=True):
+    def get_posture_status(self, image, points, file_name, view_point, output_path, front_label_path, side_label_path,
+                           draw_joint_points=True):
         self.result['image_number'].append(file_name.split(sep='.')[0].split(sep='_')[1])
         self.description = ""
         self.image = image
@@ -51,20 +61,20 @@ class RuleProvider:
         self.output_path = output_path
         figsize = (int(image.shape[0] * self.resize_factor), int(image.shape[1] * self.resize_factor))
         if view_point == "front":
-            self.figure_front, self.axs_front = plt.subplots(1, 3) #, figsize=figsize)
+            self.figure_front, self.axs_front = plt.subplots(1, 3)  # , figsize=figsize)
             self.figure_front.tight_layout()
             arm_score = 1
             phone_score = 1
             trunk_score = 1
             self.labels = self.get_labels(front_label_path)
         else:
-            self.figure_side, self.axs_side = plt.subplots(1, 3) #, figsize=figsize)
+            self.figure_side, self.axs_side = plt.subplots(1, 3)  # , figsize=figsize)
             self.figure_side.tight_layout()
             chair_score = 1
             backrest_score = 1
             monitor_score = 1
             self.labels = self.get_labels(side_label_path)
-        #mouse_score = 1
+        # mouse_score = 1
         posture_status = False
         self.file_name = os.path.splitext(file_name)[0]
         if draw_joint_points:
@@ -81,27 +91,28 @@ class RuleProvider:
             backrest_score = self.get_backrest_score()
             self.result['back'].append(backrest_score)
 
-
             # Monitor (0/6)
             monitor_score = self.get_monitor_score()
             self.result['monitor'].append(monitor_score)
             self.figure_side.savefig(f'{self.output_path}/{self.file_name}.JPG')
-            #self.figure_side.close()
+            # self.figure_side.close()
             plt.close()
 
 
         else:
-            #import pudb; pu.db
+            # import pudb; pu.db
 
             # Armrest (3/4)
             arm_score = self.get_arm_score()
+            self.result['arm'].append(arm_score)
             trunk_score = self.get_trunk_score()
+            self.result['trunck'].append(trunk_score)
 
             # Telephone (1/3)
             phone_score = self.get_phone_score()
+            self.result['neck'].append(phone_score)
             self.figure_front.savefig(f'{self.output_path}/{self.file_name}.JPG')
             plt.close()
-
 
         if self.camera_view_point == 'side':
             print(f'chair score is: {chair_score}\n'
@@ -109,7 +120,7 @@ class RuleProvider:
                   f'monitor score is: {monitor_score}\n')
         else:
             print(f'arm score is: {arm_score}\n'
-                    f'phone score is: {phone_score}\n')
+                  f'phone score is: {phone_score}\n')
 
         return posture_status
 
@@ -118,7 +129,7 @@ class RuleProvider:
         axis = self.axs_side[0]
         self.axs_side[0].set_title('Chair Score')
         self.axs_side[0].axis('off')
-        #axis.imshow(self.blured_image)
+        # axis.imshow(self.blured_image)
         axis.imshow(self.resize(self.blured_image))
 
         chair_score = 1
@@ -166,8 +177,9 @@ class RuleProvider:
                 self.description = self.description + \
                                    f'Left knee status is in CORRECT POSTURE - left hip_knee_ankle angle: {l_hip_knee_ankle_angle}\n'
             self.draw_lines_between_pairs(axis, l_hip_knee_ankle_points, c)
-            self.put_text_add_description(axis, self.output_path, self.file_name, 'Left leg angle', l_hip_knee_ankle_angle, c, 10 , 60)
-                #import pudb; pu.db
+            self.put_text_add_description(axis, self.output_path, self.file_name, 'Left leg angle',
+                                          l_hip_knee_ankle_angle, c, 10, 60)
+            # import pudb; pu.db
             # if r_hip_knee_ankle_angle and l_hip_knee_ankle_angle:
             #     # Condition 1: Front Leg
             #     if diff_x_lknee_lhip > 0:
@@ -187,8 +199,8 @@ class RuleProvider:
             print("Not Enough Info")
             self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red')
             chair_score = None
-        #import pudb; pu.db
-        #axis.imshow(self.resize(self.blured_image))
+        # import pudb; pu.db
+        # axis.imshow(self.resize(self.blured_image))
         self.result['chair_angle'].append(l_hip_knee_ankle_angle)
         return l_chair_score
 
@@ -199,38 +211,41 @@ class RuleProvider:
         self.axs_front[0].set_title('Armrest Score')
         self.axs_front[0].axis('off')
         axis.imshow(self.resize(self.blured_image))
-        #if True: #self.camera_view_point == "front": ###################################################
+        final_angle = None
+        # if True: #self.camera_view_point == "front": ###################################################
         if hasattr(self.pose_detector, 'Neck'):
             shoulders_neck_angle = self.get_shoulders_neck_angle()
-            shoulders_neck_points = [self.pose_detector.Neck, self.pose_detector.RShoulder, self.pose_detector.LShoulder]
+            shoulders_neck_points = [self.pose_detector.Neck, self.pose_detector.RShoulder,
+                                     self.pose_detector.LShoulder]
             if shoulders_neck_angle:
                 if shoulders_neck_angle < 160:
                     arm_score = 2
                     c = 'red'
-                    #self.draw_lines_between_pairs(shoulders_neck_points, False)
+                    # self.draw_lines_between_pairs(shoulders_neck_points, False)
                     self.description = self.description + f'Shoulders are SHRUGGED - shoulders_neck angle: {shoulders_neck_angle} \n'
                 else:
                     c = 'green'
-                    #self.draw_lines_between_pairs(shoulders_neck_points)
+                    # self.draw_lines_between_pairs(shoulders_neck_points)
                     self.description = self.description + f'Shoulders are in NORMAL POSTURE - shoulders_neck angle: {shoulders_neck_angle} \n'
                 self.draw_lines_between_pairs(axis, shoulders_neck_points, c)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'Neck angle', shoulders_neck_angle, c) #, 10 , 60)
+                self.put_text_add_description(axis, self.output_path, self.file_name, 'Neck angle',
+                                              shoulders_neck_angle, c)  # , 10 , 60)
             else:
                 print("Not Enough Info")
                 self.put_text_add_description(axis, self.output_path, self.file_name, "NEI ", None, 'red')
         else:
             print("Not Enough Info")
             self.put_text_add_description(axis, self.output_path, self.file_name, "NEI shrogged ", None, 'red')
-            #import pudb; pu.db
+            # import pudb; pu.db
         #########################################################################################
         r_elbow_shoulder_hip_angle = self.get_r_elbow_shoulder_hip_angle()
         l_elbow_shoulder_hip_angle = self.get_l_elbow_shoulder_hip_angle()
-        
-        r_elbow_shoulder_hip_angle_points = [self.pose_detector.RElbow, self.pose_detector.RShoulder, 
-                self.pose_detector.RHip]
+
+        r_elbow_shoulder_hip_angle_points = [self.pose_detector.RElbow, self.pose_detector.RShoulder,
+                                             self.pose_detector.RHip]
 
         l_elbow_shoulder_hip_angle_points = [self.pose_detector.LElbow, self.pose_detector.LShoulder,
-                self.pose_detector.LHip]
+                                             self.pose_detector.LHip]
         if r_elbow_shoulder_hip_angle or l_elbow_shoulder_hip_angle:
             if r_elbow_shoulder_hip_angle is not None:
                 if r_elbow_shoulder_hip_angle > 40:
@@ -245,7 +260,8 @@ class RuleProvider:
                                                           f'Angle between right shoulder_elbow and vertical axis: ' \
                                                           f'{r_elbow_shoulder_hip_angle}\n'
                 self.draw_lines_between_pairs(axis, r_elbow_shoulder_hip_angle_points, c)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'Right elbow angle', r_elbow_shoulder_hip_angle, c, 10, 60)
+                self.put_text_add_description(axis, self.output_path, self.file_name, 'Right elbow angle',
+                                              r_elbow_shoulder_hip_angle, c, 10, 60)
 
             if l_elbow_shoulder_hip_angle is not None:
                 if l_elbow_shoulder_hip_angle > 40:
@@ -260,31 +276,34 @@ class RuleProvider:
                                                           f'Angle between left shoulder_elbow and vertical axis: ' \
                                                           f'{l_elbow_shoulder_hip_angle}\n'
                 self.draw_lines_between_pairs(axis, l_elbow_shoulder_hip_angle_points, c)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'Left elbow angle', l_elbow_shoulder_hip_angle, c, 10, 90)
-            self.put_score_label(axis, 'arm', arm_score, self.labels[self.file_name][0] + self.labels[self.file_name][1] -1)
+                self.put_text_add_description(axis, self.output_path, self.file_name, 'Left elbow angle',
+                                              l_elbow_shoulder_hip_angle, c, 10, 90)
+            self.put_score_label(axis, 'arm', arm_score,
+                                 self.labels[self.file_name][0] + self.labels[self.file_name][1] - 1)
         else:
             print("Not Enough Info")
-            self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red', 10, 120)
+            self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red', 10,
+                                          120)
             arm_score = None
-        #import pudb; pu.db
-        #plt.show()
+        # import pudb; pu.db
+        # plt.show()
+        self.result['arm_angle_r'].append(r_elbow_shoulder_hip_angle)
+        self.result['arm_angle_l'].append(l_elbow_shoulder_hip_angle)
         return arm_score
-
-
 
     def get_backrest_score(self):
         self.get_blure_image()
         axis = self.axs_side[1]
         self.axs_side[1].set_title('Backrest Score')
         self.axs_side[1].axis('off')
-        #axis.imshow(self.blured_image)
+        # axis.imshow(self.blured_image)
         axis.imshow(self.resize(self.blured_image))
         backrest_score = 1
         mid_shoulder_hip_knee = None
-        if (((self.points[self.pose_detector.LHip] is not None) and 
-                (self.points[self.pose_detector.LShoulder] is not None)) or
+        if (((self.points[self.pose_detector.LHip] is not None) and
+             (self.points[self.pose_detector.LShoulder] is not None)) or
                 ((self.points[self.pose_detector.RHip] is not None) and
-                    (self.points[self.pose_detector.RShoulder] is not None))):
+                 (self.points[self.pose_detector.RShoulder] is not None))):
 
             if self.points[self.pose_detector.RHip] is None:  # if one of the hips is not available
                 self.points[self.pose_detector.RHip] = self.points[self.pose_detector.LHip]
@@ -295,17 +314,18 @@ class RuleProvider:
                 self.points[self.pose_detector.RShoulder] = self.points[self.pose_detector.LShoulder]
             elif self.points[self.pose_detector.LShoulder] is None:
                 self.points[self.pose_detector.LShoulder] = self.points[self.pose_detector.RShoulder]
-            
-            # middle of shoulders (x coordinate)
-            MidHip = tuple(((np.array(self.points[self.pose_detector.RHip]) + 
-                np.array(self.points[self.pose_detector.LHip]))/2).astype(int))
-            MidShoulder = tuple(((np.array(self.points[self.pose_detector.RShoulder]) + 
-                np.array(self.points[self.pose_detector.LShoulder]))/2).astype(int))
 
-            #import pudb; pu.db
+            # middle of shoulders (x coordinate)
+            MidHip = tuple(((np.array(self.points[self.pose_detector.RHip]) +
+                             np.array(self.points[self.pose_detector.LHip])) / 2).astype(int))
+            MidShoulder = tuple(((np.array(self.points[self.pose_detector.RShoulder]) +
+                                  np.array(self.points[self.pose_detector.LShoulder])) / 2).astype(int))
+
+            # import pudb; pu.db
             mid_shoulder_hip_knee = self.get_mid_shoulder_hip_knee_angle(MidHip, MidShoulder)
-            mid_shoulder_hip_knee_points = [[list(MidShoulder)[0], list(MidShoulder)[1]], [list(MidHip)[0], list(MidHip)[1]],
-                    [list(MidHip)[0] - 50, list(MidHip)[1]]]
+            mid_shoulder_hip_knee_points = [[list(MidShoulder)[0], list(MidShoulder)[1]],
+                                            [list(MidHip)[0], list(MidHip)[1]],
+                                            [list(MidHip)[0] - 50, list(MidHip)[1]]]
             if mid_shoulder_hip_knee:
                 if mid_shoulder_hip_knee < (79):
                     backrest_score = 2
@@ -321,29 +341,29 @@ class RuleProvider:
                     c = 'green'
                     self.description = self.description + f'Back rest is NORMAL - ' \
                                                           f'mid shoulder_hip_knee angle: {mid_shoulder_hip_knee}\n'
-            
+
             self.draw_lines_between_pairs(axis, mid_shoulder_hip_knee_points, c, True)
-            self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle', mid_shoulder_hip_knee, c, 10, 30)
+            self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle', mid_shoulder_hip_knee,
+                                          c, 10, 30)
             self.put_score_label(axis, 'back rest', backrest_score, self.labels[self.file_name][0])
 
         else:
             print("Not Enough Info")
             self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red')
             backrest_score = None
-        #import pudb; pu.db
-        #axis.imshow(self.blured_image)
+        # import pudb; pu.db
+        # axis.imshow(self.blured_image)
         self.result['back_angle'].append(mid_shoulder_hip_knee)
         return backrest_score
-        
 
     def get_monitor_score(self):
-        #import pudb; pu.db
+        # import pudb; pu.db
         monitor_score = 1
         self.get_blure_image()
         axis = self.axs_side[2]
         self.axs_side[2].set_title('monitor_score')
         self.axs_side[2].axis('off')
-        #axis.imshow(self.blured_image)
+        # axis.imshow(self.blured_image)
         axis.imshow(self.resize(self.blured_image))
         # if True: #self.camera_view_point == "side":
         r_hip_shoulder_ear_angle = self.get_r_hip_shoulder_ear_angle()
@@ -378,37 +398,37 @@ class RuleProvider:
                 if l_hip_shoulder_ear_angle < 150 - 15:
                     monitor_score = 2
                     c = 'red'
-                    #self.draw_lines_between_pairs(l_hip_shoulder_ear_points, False)
+                    # self.draw_lines_between_pairs(l_hip_shoulder_ear_points, False)
                     self.description = self.description + f'Neck is BENT FORWARD from left side view - ' \
                                                           f'left hip_shoulder_ear angle: {l_hip_shoulder_ear_angle} \n'
                 elif l_hip_shoulder_ear_angle > 150 + 18:
                     monitor_score = 3
                     c = 'red'
-                    #self.draw_lines_between_pairs(l_hip_shoulder_ear_points, False)
+                    # self.draw_lines_between_pairs(l_hip_shoulder_ear_points, False)
                     self.description = self.description + f'Neck is BENT BACKWARD from left side view - ' \
                                                           f'left hip_shoulder_ear angle: {l_hip_shoulder_ear_angle} \n'
                 else:
                     c = 'green'
-                    #self.draw_lines_between_pairs(l_hip_shoulder_ear_points)
+                    # self.draw_lines_between_pairs(l_hip_shoulder_ear_points)
                     self.description = self.description + f'Neck is NORMAL from left side view - ' \
                                                           f'left hip_shoulder_ear angle: {l_hip_shoulder_ear_angle} \n'
                 self.draw_lines_between_pairs(axis, l_hip_shoulder_ear_points, c)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'neck angle', l_hip_shoulder_ear_angle, c)
-            #import pudb; pu.db
+                self.put_text_add_description(axis, self.output_path, self.file_name, 'neck angle',
+                                              l_hip_shoulder_ear_angle, c)
+            # import pudb; pu.db
             self.put_score_label(axis, 'monitor', monitor_score, self.labels[self.file_name][2])
         else:
             print("Not Enough Info")
             self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red')
             monitor_score = None
-        
-        #import pudb; pu.db
-        #axis.imshow(self.resize(self.blured_image))
-        self.result['monitor_angle'].append(l_hip_shoulder_ear_angle)
-        return monitor_score 
 
+        # import pudb; pu.db
+        # axis.imshow(self.resize(self.blured_image))
+        self.result['monitor_angle'].append(l_hip_shoulder_ear_angle)
+        return monitor_score
 
     def get_phone_score(self):
-        #import pudb; pu.db
+        # import pudb; pu.db
         phone_score = 1
         self.get_blure_image()
         axis = self.axs_front[1]
@@ -416,13 +436,12 @@ class RuleProvider:
         self.axs_front[1].axis('off')
         axis.imshow(self.blured_image)
 
-        #import pudb; pu.db
+        # import pudb; pu.db
         angle_between_shoulders_and_eyes = self.get_angle_between_shoulders_and_eyes()
-
 
         two_eyes_points = [self.pose_detector.LEye, self.pose_detector.REye]
         two_shoulders_points = [self.pose_detector.LShoulder, self.pose_detector.RShoulder]
-        #import pudb; pu.db
+        # import pudb; pu.db
         #    if math.fabs(two_eyes_vertical_axis_angle - two_shoulders_vertical_axis_angle) > 30:
         if angle_between_shoulders_and_eyes is not None:
             if angle_between_shoulders_and_eyes > 16:
@@ -430,68 +449,76 @@ class RuleProvider:
                 phone_score += 1
                 self.description = self.description + f'Neck is BENT LEFTWARD from front view - ' \
                                                       f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
-           # elif 120 < angle_between_shoulders_and_eyes < 150:
-           #     c = 'red'
-           #     phone_score += 1
-           #     self.description = self.description + f'Neck is BENT RIGHTWARD from front view - ' \
-           #                                           f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
+            # elif 120 < angle_between_shoulders_and_eyes < 150:
+            #     c = 'red'
+            #     phone_score += 1
+            #     self.description = self.description + f'Neck is BENT RIGHTWARD from front view - ' \
+            #                                           f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
             else:
                 c = 'green'
                 self.description = self.description + f'Neck is not BENT RIGHTWARD or leftward - ' \
                                                       f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
-            
+
             self.draw_lines_between_pairs(axis, two_eyes_points, c)
             self.draw_lines_between_pairs(axis, two_shoulders_points, c)
-            self.put_text_add_description(axis, self.output_path, self.file_name, 'angle between 2 \n eyes and 2 shoulders', angle_between_shoulders_and_eyes, c)
+            self.put_text_add_description(axis, self.output_path, self.file_name,
+                                          'angle between 2 \n eyes and 2 shoulders', angle_between_shoulders_and_eyes,
+                                          c)
             self.put_score_label(axis, 'phone', phone_score,
-                    self.labels[self.file_name][2])
+                                 self.labels[self.file_name][2])
         else:
             print("Not Enough Info")
             self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red')
             monitor_score = None
 
-            #return monitor_score
-            
-        # import pudb; pu.db
+            # return monitor_score
 
+        # import pudb; pu.db
+        self.result['neck_angle'].append(angle_between_shoulders_and_eyes)
         return phone_score
-#############################################################################################
+
+    #############################################################################################
 
     def get_trunk_score(self):
         self.get_blure_image()
         axis = self.axs_front[2]
         self.axs_front[2].set_title('Trunk Score')
         self.axs_front[2].axis('off')
-        #axis.imshow(self.blured_image)
+        # axis.imshow(self.blured_image)
         axis.imshow(self.resize(self.blured_image))
         backrest_score = 1
         # import pudb; pu.db
         if self.points[self.pose_detector.RHip] and self.points[self.pose_detector.RShoulder]:
             r_shoulder_hip_vertical_angle = self.get_r_shoulder_hip_vertical_angle()
             r_shoulder_hip_vertical_points = [self.points[self.pose_detector.RShoulder],
-                self.points[self.pose_detector.RHip],
-                (self.points[self.pose_detector.RHip][0], self.points[self.pose_detector.RHip][1] - 100)]
-        else: 
+                                              self.points[self.pose_detector.RHip],
+                                              (self.points[self.pose_detector.RHip][0],
+                                               self.points[self.pose_detector.RHip][1] - 100)]
+        else:
             r_shoulder_hip_vertical_angle = None
 
         if self.points[self.pose_detector.LHip] and self.points[self.pose_detector.LShoulder]:
             l_shoulder_hip_vertical_angle = self.get_l_shoulder_hip_vertical_angle()
             l_shoulder_hip_vertical_points = [self.points[self.pose_detector.LShoulder],
-                self.points[self.pose_detector.LHip],
-                (self.points[self.pose_detector.LHip][0], self.points[self.pose_detector.LHip][1] - 100)]
-        else: l_shoulder_hip_vertical_angle = None
-        
+                                              self.points[self.pose_detector.LHip],
+                                              (self.points[self.pose_detector.LHip][0],
+                                               self.points[self.pose_detector.LHip][1] - 100)]
+        else:
+            l_shoulder_hip_vertical_angle = None
+
         if r_shoulder_hip_vertical_angle or l_shoulder_hip_vertical_angle:
             if r_shoulder_hip_vertical_angle and l_shoulder_hip_vertical_angle:
                 if max(r_shoulder_hip_vertical_angle, l_shoulder_hip_vertical_angle) > 15:
-                    backrest_score = 2 
+                    backrest_score = 2
                     c = 'red'
-                else: 
+                else:
                     c = 'green'
                 self.draw_lines_between_pairs(axis, r_shoulder_hip_vertical_points, c, True)
                 self.draw_lines_between_pairs(axis, l_shoulder_hip_vertical_points, c, True)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_r', r_shoulder_hip_vertical_angle , c, 9, 30)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_l', l_shoulder_hip_vertical_angle , c, 9, 60)
+                self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_r',
+                                              r_shoulder_hip_vertical_angle, c, 9, 30)
+                self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_l',
+                                              l_shoulder_hip_vertical_angle, c, 9, 60)
 
             elif r_shoulder_hip_vertical_angle:
                 if r_shoulder_hip_vertical_angle > 15:
@@ -500,32 +527,36 @@ class RuleProvider:
                 else:
                     c = 'green'
                 self.draw_lines_between_pairs(axis, r_shoulder_hip_vertical_points, c, True)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_r', r_shoulder_hip_vertical_angle , c, 9, 30)
+                self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_r',
+                                              r_shoulder_hip_vertical_angle, c, 9, 30)
             elif l_shoulder_hip_vertical_angle:
                 if l_shoulder_hip_vertical_angle > 15:
-                    backrest_score = 2       
+                    backrest_score = 2
                     c = 'red'
                 else:
                     c = 'green'
                 self.draw_lines_between_pairs(axis, l_shoulder_hip_vertical_points, c, True)
-                self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_l', l_shoulder_hip_vertical_angle , c, 9, 30)
+                self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_l',
+                                              l_shoulder_hip_vertical_angle, c, 9, 30)
 
             self.put_score_label(axis, 'back rest', backrest_score, self.labels[self.file_name][3])
-        
+
         else:
             print("Not Enough Info")
             self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red')
             backrest_score = None
-            #import pudb; pu.db
-            #axis.imshow(self.blured_image)
+            # import pudb; pu.db
+            # axis.imshow(self.blured_image)
+        self.result['trunck_angle_r'].append(r_shoulder_hip_vertical_angle)
+        self.result['trunck_angle_l'].append(l_shoulder_hip_vertical_angle)
         return backrest_score
-
 
     def get_angle_between_shoulders_and_eyes(self):
         if self.points[self.pose_detector.LEye] and self.points[self.pose_detector.REye] and \
                 self.points[self.pose_detector.LShoulder] and self.points[self.pose_detector.RShoulder]:
             v1 = np.array(self.points[self.pose_detector.LEye]) - np.array(self.points[self.pose_detector.REye])
-            v2 = np.array(self.points[self.pose_detector.LShoulder]) - np.array(self.points[self.pose_detector.RShoulder])
+            v2 = np.array(self.points[self.pose_detector.LShoulder]) - np.array(
+                self.points[self.pose_detector.RShoulder])
             angle = self.get_angle_between_lines(v1, v2)
             if angle is None:
                 return None
@@ -534,123 +565,140 @@ class RuleProvider:
         else:
             return None
 
-
     def get_r_hip_knee_ankle_angle(self):
         # rHipKneeAnkle_pairs = [[8, 9], [9, 10]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.RHip], self.points[self.pose_detector.RKnee],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.RHip],
+                                              self.points[self.pose_detector.RKnee],
                                               self.points[self.pose_detector.RAnkle])
         return angle
 
     def get_l_hip_knee_ankle_angle(self):
         # lHipKneeAnkle_pairs = [[11, 12], [12, 13]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.LHip], self.points[self.pose_detector.LKnee],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.LHip],
+                                              self.points[self.pose_detector.LKnee],
                                               self.points[self.pose_detector.LAnkle])
         return angle
 
     def get_r_elbow_shoulder_hip_angle(self):
-        angle = self.get_angle_between_points(self.points[self.pose_detector.RElbow], self.points[self.pose_detector.RShoulder],
-                                                              self.points[self.pose_detector.RHip])
+        angle = self.get_angle_between_points(self.points[self.pose_detector.RElbow],
+                                              self.points[self.pose_detector.RShoulder],
+                                              self.points[self.pose_detector.RHip])
         return angle
 
     def get_l_elbow_shoulder_hip_angle(self):
-        angle = self.get_angle_between_points(self.points[self.pose_detector.LElbow], self.points[self.pose_detector.LShoulder],
-                                                self.points[self.pose_detector.LHip])
+        angle = self.get_angle_between_points(self.points[self.pose_detector.LElbow],
+                                              self.points[self.pose_detector.LShoulder],
+                                              self.points[self.pose_detector.LHip])
         return angle
 
     def get_shoulders_neck_angle(self):
         # shoulders_neck_pairs = [[2, 1], [1, 5]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.RShoulder], self.points[self.pose_detector.Neck],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.RShoulder],
+                                              self.points[self.pose_detector.Neck],
                                               self.points[self.pose_detector.LShoulder])
         return angle
 
     def get_r_neck_shoulder_elbow_angle(self):
         # rNeckShoulderElbow_pairs = [[1, 2], [2, 3]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.Neck], self.points[self.pose_detector.RShoulder],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.Neck],
+                                              self.points[self.pose_detector.RShoulder],
                                               self.points[self.pose_detector.RElbow])
         return angle
 
     def get_l_neck_shoulder_elbow_angle(self):
         # lNeckShoulderElbow_pairs = [[1, 5], [5, 6]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.Neck], self.points[self.pose_detector.LShoulder],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.Neck],
+                                              self.points[self.pose_detector.LShoulder],
                                               self.points[self.pose_detector.LElbow])
         return angle
 
     def get_r_shoulder_hip_vertical_angle(self):
         angle = self.get_angle_between_vector_and_vertical_axis(
-                np.array(self.points[self.pose_detector.RHip]) - np.array(self.points[self.pose_detector.RShoulder]))
+            np.array(self.points[self.pose_detector.RHip]) - np.array(self.points[self.pose_detector.RShoulder]))
         return angle
+
     def get_l_shoulder_hip_vertical_angle(self):
         angle = self.get_angle_between_vector_and_vertical_axis(
-                np.array(self.points[self.pose_detector.LHip]) - np.array(self.points[self.pose_detector.LShoulder]))
+            np.array(self.points[self.pose_detector.LHip]) - np.array(self.points[self.pose_detector.LShoulder]))
         return angle
 
     def get_mid_shoulder_hip_knee_angle(self, MidHip, MidShoulder):
         angle = self.get_angle_between_vector_and_horizontal_axis(
-                np.array(MidHip) - np.array(MidShoulder))
+            np.array(MidHip) - np.array(MidShoulder))
         return angle
 
     def get_mid_shoulder_hip_vertical_angle(self, MidHip, MidShoulder):
         angle = self.get_angle_between_vector_and_vertical_axis(
-                np.array(MidHip) - np.array(MidShoulder))
+            np.array(MidHip) - np.array(MidShoulder))
         return angle
-
 
     def get_r_shoulder_elbow_wrist(self):
         # r_shoulder_elbow_wrist_pairs = [[2, 3], [3, 4]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.RShoulder], self.points[self.pose_detector.RElbow],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.RShoulder],
+                                              self.points[self.pose_detector.RElbow],
                                               self.points[self.pose_detector.RWrist])
         return angle
 
     def get_l_shoulder_elbow_wrist(self):
         # l_shoulder_elbow_wrist_pairs = [[5, 6], [6, 7]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.LShoulder], self.points[self.pose_detector.LElbow],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.LShoulder],
+                                              self.points[self.pose_detector.LElbow],
                                               self.points[self.pose_detector.LWrist])
         return angle
 
     def get_r_hip_shoulder_elbow_angle(self):
         # rHipShoulderElbow_pairs = [[3, 2], [2, 8]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.RElbow], self.points[self.pose_detector.RShoulder],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.RElbow],
+                                              self.points[self.pose_detector.RShoulder],
                                               self.points[self.pose_detector.RHip])
         return angle
 
     def get_l_hip_shoulder_elbow_angle(self):
         # lHipShoulderElbow_pairs = [[6, 5], [5, 11]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.LElbow], self.points[self.pose_detector.LShoulder], self.points[self.pose_detector.LHip])
+        angle = self.get_angle_between_points(self.points[self.pose_detector.LElbow],
+                                              self.points[self.pose_detector.LShoulder],
+                                              self.points[self.pose_detector.LHip])
         return angle
 
     def get_r_shoulder_elbow_wrist_angle(self):
         # rShoulderElbowWrist_pairs = [[2, 3], [3, 4]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.RShoulder], self.points[self.pose_detector.RElbow],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.RShoulder],
+                                              self.points[self.pose_detector.RElbow],
                                               self.points[self.pose_detector.RWrist])
         return angle
 
     def get_l_shoulder_elbow_wrist_angle(self):
         # lShoulderElbowWrist_pairs = [[5, 6], [6, 7]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.LShoulder], self.points[self.pose_detector.LElbow],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.LShoulder],
+                                              self.points[self.pose_detector.LElbow],
                                               self.points[self.pose_detector.LWrist])
         return angle
 
     def get_r_hip_shoulder_ear_angle(self):
         # r_hip_shoulder_ear_pairs = [[8, 2], [2, 16]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.RHip], self.points[self.pose_detector.RShoulder],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.RHip],
+                                              self.points[self.pose_detector.RShoulder],
                                               self.points[self.pose_detector.REar])
         return angle
 
     def get_l_hip_shoulder_ear_angle(self):
         # l_hip_shoulder_ear_pairs = [[11, 5], [5, 17]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.LHip], self.points[self.pose_detector.LShoulder],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.LHip],
+                                              self.points[self.pose_detector.LShoulder],
                                               self.points[self.pose_detector.LEar])
         return angle
 
     def get_r_ear_eye_shoulder_angle(self):
         # l_ear_eye_shoulder_pairs = [[16, 14], [14, 2]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.REye], self.points[self.pose_detector.REar],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.REye],
+                                              self.points[self.pose_detector.REar],
                                               self.points[self.pose_detector.RShoulder])
         return angle
 
     def get_l_ear_eye_shoulder_angle(self):
         # l_ear_eye_shoulder_pairs = [[17, 15], [15, 5]]
-        angle = self.get_angle_between_points(self.points[self.pose_detector.LEye], self.points[self.pose_detector.LEar],
+        angle = self.get_angle_between_points(self.points[self.pose_detector.LEye],
+                                              self.points[self.pose_detector.LEar],
                                               self.points[self.pose_detector.LShoulder])
         return angle
 
@@ -695,7 +743,7 @@ class RuleProvider:
         if p1 and p2 and p3:
             v1, v2 = self.get_vectors_between_points(p2, p1, p2, p3)
             angle = self.get_angle_between_lines(v1, v2)
-            #import pudb; pu.db
+            # import pudb; pu.db
             if angle is None:
                 return None
             else:
@@ -709,7 +757,7 @@ class RuleProvider:
                 cv2.circle(self.image, point, self.circle_radius, (0, 255, 0), thickness=-1, lineType=cv2.FILLED)
         cv2.imwrite(f'../joints/{file_name}', self.image)
 
-    def draw_lines_between_pairs(self, axis, points,  color, is_point_pixel=False):
+    def draw_lines_between_pairs(self, axis, points, color, is_point_pixel=False):
         x = []
         y = []
         for point in points:
@@ -720,18 +768,17 @@ class RuleProvider:
                 x.append(point[0])
                 y.append(point[1])
 
-        #import pudb; pu.db        
-        axis.plot(list(np.array(x) * self.resize_factor) , list(np.array(y) * self.resize_factor) , c=color)
-            
-    
+        # import pudb; pu.db
+        axis.plot(list(np.array(x) * self.resize_factor), list(np.array(y) * self.resize_factor), c=color)
+
     def get_blure_image(self):
-        #import pudb; pu.db
+        # import pudb; pu.db
         img_copy = self.image.copy()
         img = np.array(img_copy)[:, :, ::-1]
         face_blur_provider = FaceBlurring()
-        self.blured_image = face_blur_provider.blur_face(self.points, self.pose_detector.Nose, self.pose_detector.LEye, 
-                self.pose_detector.REye, self.pose_detector.LEar, self.pose_detector.REar, img)
-
+        self.blured_image = face_blur_provider.blur_face(self.points, self.pose_detector.Nose, self.pose_detector.LEye,
+                                                         self.pose_detector.REye, self.pose_detector.LEar,
+                                                         self.pose_detector.REar, img)
 
     def put_text_add_description(self, axis, output_directory, file_name, rule_name, angle, color, x=10, y=30):
         angle_text = round(angle, 1) if angle is not None else None
@@ -743,15 +790,14 @@ class RuleProvider:
         text_file.close()
 
     def put_score_label(self, axis, rule, score, label, x=1):
-        axis.text(10 , int(self.image.shape[0] - 10 * x * self.resize_factor) , f'{rule} score: {score}' + '\n' + f'label: {label}')
+        axis.text(10, int(self.image.shape[0] - 10 * x * self.resize_factor),
+                  f'{rule} score: {score}' + '\n' + f'label: {label}')
         if score == label:
             main_label = 'True'
         else:
             main_label = 'False'
-        axis.text(10 , int(self.image.shape[0] + 50 * x * self.resize_factor) , f'{main_label}')
-        #axis.text(int(self.image.shape[1] - 50) , int(self.image.shape[0] - 10 * x  * self.resize_factor) , f'label: {label}')
-   
+        axis.text(10, int(self.image.shape[0] + 50 * x * self.resize_factor), f'{main_label}')
+        # axis.text(int(self.image.shape[1] - 50) , int(self.image.shape[0] - 10 * x  * self.resize_factor) , f'label: {label}')
+
     def resize(self, image):
-       return cv2.resize(image, None, fx = self.resize_factor, fy = self.resize_factor)
-
-
+        return cv2.resize(image, None, fx=self.resize_factor, fy=self.resize_factor)
