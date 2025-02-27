@@ -12,8 +12,8 @@ from rule_provider import RuleProvider
 deep_model = "Openpifpaf" #"Mediapipe" #"Openpifpaf"  #"openpose" 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--input_path', default='/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/input/main_input/side', help='path to input directory')
-parser.add_argument('--output_path', default=f'../output/{deep_model}', help='path to output directory')
+parser.add_argument('--input_path', default='/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/input/main_input/front', help='path to input directory')
+parser.add_argument('--output_path', default=f'../output/{deep_model}_front', help='path to output directory')
 parser.add_argument('--frame_rate', default=10, help='video frame rate')
 parser.add_argument('--front_labels_path', default='front_labels.csv', help='front labels path')
 parser.add_argument('--side_labels_path', default='side_labels.csv', help='side labels path')
@@ -34,7 +34,7 @@ def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provide
         position_status = rosa_rule_provider.get_posture_status(resized_image, points, file_name, camera_view_point, args.output_path, args.front_labels_path, args.side_labels_path)
         #rosa_rule_provider.save_image(position_status, args.output_path, file_name)
         print('*******************************************************************************************')
-    pd.DataFrame(rosa_rule_provider.result).to_csv(f'./../output/pred_{deep_model}.csv', index=False)
+    pd.DataFrame({k: pd.Series(v) for k, v in rosa_rule_provider.result.items()}).to_csv(f'./../output/pred_{deep_model}_front.csv', index=False)
 
 
 def main():
