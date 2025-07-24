@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 from typing import List
 
 
-def make_ready4plot(pred_path, act_path, part):
+def make_ready4plot(pred_path, act_path, part, usecols):
     # Plot dist of data
     pre = pd.read_csv(pred_path,
-                      usecols=['image_number', f'{part}_angle_r', f'{part}_angle_l']).sort_values('image_number').drop(['image_number'],
-                                                                                                  axis=1).reset_index(
+                      usecols=usecols).sort_values('image_number').drop(
+        ['image_number'],
+        axis=1).reset_index(
         drop=True)
     act = pd.read_csv(act_path,
                       usecols=['image_number', part]).sort_values('image_number').reset_index(drop=True)
