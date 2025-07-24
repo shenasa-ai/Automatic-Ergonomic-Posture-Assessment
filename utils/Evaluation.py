@@ -51,12 +51,11 @@ def calculate_accuracy(
         pred_series = pred_df[pred_part].reset_index(drop=True)
         actual_series = actual_df[actual_part].reset_index(drop=True)
         mismatches = actual_series[actual_series != pred_series].index.tolist()
+        failures = []
         for img in mismatches:
             img_nmbr = actual_df['image_number'].iloc[img]  # Ensure we use iloc to access by position
-            print(img_nmbr)
-        pass
-
-
+            failures.append(img_nmbr)
+        print(failures)
     # Calculate accuracy
     if pred_part is None and actual_part is None:
         return accuracy_score(actual_df, pred_df)
