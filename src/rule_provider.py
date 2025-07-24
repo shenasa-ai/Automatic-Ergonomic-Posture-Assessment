@@ -370,9 +370,11 @@ class RuleProvider:
         r_hip_shoulder_ear_points = [self.pose_detector.RHip, self.pose_detector.RShoulder, self.pose_detector.REar]
         l_hip_shoulder_ear_angle = self.get_l_hip_shoulder_ear_angle()
         l_hip_shoulder_ear_points = [self.pose_detector.LHip, self.pose_detector.LShoulder, self.pose_detector.LEar]
+        l_ear_shoulder_vertical_angle = self.get_l_ear_shoulder_vertical()
+        l_ear_shoulder_horizental_angle = self.get_l_ear_shoulder_horizental()
 
         # if r_hip_shoulder_ear_angle or l_hip_shoulder_ear_angle:
-        if l_hip_shoulder_ear_angle:
+        if l_ear_shoulder_vertical_angle:
             # if r_hip_shoulder_ear_angle:
             #     if r_hip_shoulder_ear_angle < 140:
             #         monitor_score += 1
@@ -394,27 +396,27 @@ class RuleProvider:
             #     self.draw_lines_between_pairs(axis, r_hip_shoulder_ear_points, c)
             #     self.put_text_add_description(axis, self.output_path, self.file_name, 'neck angle', r_hip_shoulder_ear_angle, c)
 
-            if l_hip_shoulder_ear_angle:
-                if l_hip_shoulder_ear_angle < 150 - 15:
+            if l_ear_shoulder_vertical_angle:
+                # if l_ear_shoulder_horizental_angle < 25:
+                #     monitor_score = 2
+                #     c = 'red'
+                #     # self.draw_lines_between_pairs(l_hip_shoulder_ear_points, False)
+                #     self.description = self.description + f'Neck is BENT FORWARD from left side view - ' \
+                #                                           f'left hip_shoulder_ear angle: {l_ear_shoulder_horizental_angle} \n'
+                if l_ear_shoulder_vertical_angle > 25:
                     monitor_score = 2
                     c = 'red'
                     # self.draw_lines_between_pairs(l_hip_shoulder_ear_points, False)
-                    self.description = self.description + f'Neck is BENT FORWARD from left side view - ' \
-                                                          f'left hip_shoulder_ear angle: {l_hip_shoulder_ear_angle} \n'
-                elif l_hip_shoulder_ear_angle > 150 + 18:
-                    monitor_score = 3
-                    c = 'red'
-                    # self.draw_lines_between_pairs(l_hip_shoulder_ear_points, False)
                     self.description = self.description + f'Neck is BENT BACKWARD from left side view - ' \
-                                                          f'left hip_shoulder_ear angle: {l_hip_shoulder_ear_angle} \n'
+                                                          f'left hip_shoulder_ear angle: {l_ear_shoulder_vertical_angle} \n'
                 else:
                     c = 'green'
                     # self.draw_lines_between_pairs(l_hip_shoulder_ear_points)
                     self.description = self.description + f'Neck is NORMAL from left side view - ' \
-                                                          f'left hip_shoulder_ear angle: {l_hip_shoulder_ear_angle} \n'
+                                                          f'left hip_shoulder_ear angle: {l_ear_shoulder_vertical_angle} \n'
                 self.draw_lines_between_pairs(axis, l_hip_shoulder_ear_points, c)
                 self.put_text_add_description(axis, self.output_path, self.file_name, 'neck angle',
-                                              l_hip_shoulder_ear_angle, c)
+                                              l_ear_shoulder_vertical_angle, c)
             # import pudb; pu.db
             self.put_score_label(axis, 'monitor', monitor_score, self.labels[self.file_name][2])
         else:
@@ -424,7 +426,7 @@ class RuleProvider:
 
         # import pudb; pu.db
         # axis.imshow(self.resize(self.blured_image))
-        self.result['monitor_angle'].append(l_hip_shoulder_ear_angle)
+        self.result['monitor_angle'].append(l_ear_shoulder_vertical_angle)
         return monitor_score
 
     def get_phone_score(self):
@@ -686,6 +688,31 @@ class RuleProvider:
         angle = self.get_angle_between_points(self.points[self.pose_detector.LHip],
                                               self.points[self.pose_detector.LShoulder],
                                               self.points[self.pose_detector.LEar])
+        return angle
+
+    def get_l_ear_shoulder_vertical(self):
+        if self.points[self.pose_detector.LEar] and self.points[self.pose_detector.LShoulder]:
+            virtual_point = (self.points[self.pose_detector.LShoulder][0], self.points[self.pose_detector.LEar][1])
+            angle = self.get_angle_between_points(self.points[self.pose_detector.LEar],
+                                                  self.points[self.pose_detector.LShoulder],
+                                                  virtual_point)
+        else:
+            angle = self.get_angle_between_points(self.points[self.pose_detector.LHip],
+                                                  self.points[self.pose_detector.LShoulder],
+                                                  self.points[self.pose_detector.LEar])
+        return angle
+
+
+    def get_l_ear_shoulder_horizental(self):
+        if self.points[self.pose_detector.LEar] and self.points[self.pose_detector.LShoulder]:
+            virtual_point = (self.points[self.pose_detector.LEar][0], self.points[self.pose_detector.LShoulder][1])
+            angle = self.get_angle_between_points(self.points[self.pose_detector.LEar],
+                                                  self.points[self.pose_detector.LShoulder],
+                                                  virtual_point)
+        else:
+            angle = self.get_angle_between_points(self.points[self.pose_detector.LHip],
+                                                  self.points[self.pose_detector.LShoulder],
+                                                  self.points[self.pose_detector.LEar])
         return angle
 
     def get_r_ear_eye_shoulder_angle(self):
