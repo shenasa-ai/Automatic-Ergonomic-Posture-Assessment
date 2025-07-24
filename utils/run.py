@@ -15,6 +15,7 @@ import pandas as pd
 pred_path = '/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/output/pred_Openpifpaf_front.csv'
 actual_path = '/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/labels/final_labels_front_cleared.csv'
 
+
 path = ['./../labels/front_aa.csv', './../labels/front_fj.csv', './../labels/ha_checked_front.csv']
 
 # print(FleissKappa(file_paths=path, columns=['arm angle', 'shrogged', 'neck', 'trunck']))
@@ -26,12 +27,14 @@ path = ['./../labels/front_aa.csv', './../labels/front_fj.csv', './../labels/ha_
 # clean_labels(lbl_paths='./../labels/final_labels_front.csv', img_path='/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/input/main_input/front', save_path='./../labels/final_labels_front_cleared.csv')
 
 
+# print(FleissKappa(path, columns=['arm angle', 'shrogged', 'neck', 'trunck']))
+
+
 # Evaluate
 print(calculate_accuracy(pred_part='trunck', actual_part='trunck',
                          pred_path=pred_path,
                          actual_path=actual_path))
 
-df = make_ready4plot(pred_path=pred_path, act_path=actual_path, part='trunck')
-#
-plot_data_distribution(df=df, data_col='trunck_angle_l', value_col='trunck_angle_r', z_col='image_number',
+df = make_ready4plot(pred_path=pred_path, act_path=actual_path, part='trunck', usecols=['image_number', 'trunck_angle_r', 'trunck_angle_l'])
+plot_data_distribution(df=df, data_col='trunck_angle_r', value_col='trunck_angle_l',
                        label_col='trunck')
