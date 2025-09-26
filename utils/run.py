@@ -12,8 +12,8 @@ import pandas as pd
 2 - run clean_labels
 '''
 
-pred_path = '/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/output/pred_Openpifpaf_front.csv'
-actual_path = '/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/labels/final_labels_front_cleared.csv'
+pred_path = '/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/output/pred_Openpifpaf_side.csv'
+actual_path = '/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/labels/final_labels_cleared.csv'
 
 
 path = ['./../labels/front_aa.csv', './../labels/front_fj.csv', './../labels/ha_checked_front.csv']
@@ -31,10 +31,10 @@ path = ['./../labels/front_aa.csv', './../labels/front_fj.csv', './../labels/ha_
 
 
 # Evaluate
-print(calculate_accuracy(pred_part='trunck', actual_part='trunck',
+print(calculate_accuracy(pred_part='monitor', actual_part='monitor',
                          pred_path=pred_path,
                          actual_path=actual_path))
 
-df = make_ready4plot(pred_path=pred_path, act_path=actual_path, part='trunck', usecols=['image_number', 'trunck_angle_r', 'trunck_angle_l'])
-plot_data_distribution(df=df, data_col='trunck_angle_r', value_col='trunck_angle_l',
-                       label_col='trunck')
+# df = make_ready4plot(pred_path=pred_path, act_path=actual_path, part='trunck', usecols=['image_number', 'trunck_angle_r', 'trunck_angle_l'])
+# plot_data_distribution(df=df, data_col='trunck_angle_r', value_col='trunck_angle_l',
+#                        label_col='trunck')
