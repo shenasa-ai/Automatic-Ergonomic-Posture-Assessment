@@ -289,6 +289,8 @@ class RuleProvider:
         # plt.show()
         self.result['arm_angle_r'].append(r_elbow_shoulder_hip_angle)
         self.result['arm_angle_l'].append(l_elbow_shoulder_hip_angle)
+        if arm_score > 3:
+            arm_score = 3
         return arm_score
 
     def get_backrest_score(self):
@@ -370,8 +372,12 @@ class RuleProvider:
         r_hip_shoulder_ear_points = [self.pose_detector.RHip, self.pose_detector.RShoulder, self.pose_detector.REar]
         l_hip_shoulder_ear_angle = self.get_l_hip_shoulder_ear_angle()
         l_hip_shoulder_ear_points = [self.pose_detector.LHip, self.pose_detector.LShoulder, self.pose_detector.LEar]
-        l_ear_shoulder_vertical_angle = self.get_l_ear_shoulder_vertical()
+        l_ear_shoulder_vertical_angle, virtual_point = self.get_l_ear_shoulder_vertical()
+        l_ear_shoulder_vertical_points = [self.pose_detector.LEar, self.pose_detector.LShoulder, -1]
         l_ear_shoulder_horizental_angle = self.get_l_ear_shoulder_horizental()
+
+        if virtual_point:
+            self.points[-1] = virtual_point
 
         # if r_hip_shoulder_ear_angle or l_hip_shoulder_ear_angle:
         if l_ear_shoulder_vertical_angle:
@@ -414,10 +420,10 @@ class RuleProvider:
                     # self.draw_lines_between_pairs(l_hip_shoulder_ear_points)
                     self.description = self.description + f'Neck is NORMAL from left side view - ' \
                                                           f'left hip_shoulder_ear angle: {l_ear_shoulder_vertical_angle} \n'
-                self.draw_lines_between_pairs(axis, l_hip_shoulder_ear_points, c)
+                self.draw_lines_between_pairs(axis, l_ear_shoulder_vertical_points, c)
                 self.put_text_add_description(axis, self.output_path, self.file_name, 'neck angle',
                                               l_ear_shoulder_vertical_angle, c)
-            # import pudb; pu.db
+            # # import pudb; pu.db
             self.put_score_label(axis, 'monitor', monitor_score, self.labels[self.file_name][2])
         else:
             print("Not Enough Info")
@@ -696,12 +702,12 @@ class RuleProvider:
             angle = self.get_angle_between_points(self.points[self.pose_detector.LEar],
                                                   self.points[self.pose_detector.LShoulder],
                                                   virtual_point)
+            return angle, virtual_point
         else:
             angle = self.get_angle_between_points(self.points[self.pose_detector.LHip],
                                                   self.points[self.pose_detector.LShoulder],
                                                   self.points[self.pose_detector.LEar])
-        return angle
-
+        return angle, None
 
     def get_l_ear_shoulder_horizental(self):
         if self.points[self.pose_detector.LEar] and self.points[self.pose_detector.LShoulder]:
