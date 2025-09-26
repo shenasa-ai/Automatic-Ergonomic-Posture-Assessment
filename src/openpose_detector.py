@@ -43,6 +43,21 @@ class OpenPoseDetector(PoseDetector):
             self.points_number = 15
             self.POSE_PAIRS = [[0, 1], [1, 2], [2, 3], [3, 4], [1, 5], [5, 6], [6, 7], [1, 14], [14, 8], [8, 9],
                                [9, 10], [14, 11], [11, 12], [12, 13]]
+        elif self.mode == "BODY_25":
+            self.protoFile = "../models/body_25/pose_deploy.prototxt"
+            self.weightsFile = "../models/body_25/pose_iter_584000.caffemodel"
+            self.points_number = 25
+            self.POSE_PAIRS = [
+                [0, 1], [1, 2], [2, 3], [3, 4],  # Right Arm
+                [1, 5], [5, 6], [6, 7],  # Left Arm
+                [1, 8],  # Neck → MidHip
+                [8, 9], [9, 10], [10, 11],  # Right Leg
+                [8, 12], [12, 13], [13, 14],  # Left Leg
+                [0, 15], [15, 17],  # Nose → REye → REar
+                [0, 16], [16, 18],  # Nose → LEye → LEar
+                [14, 19], [19, 20], [14, 21],  # Left Foot
+                [11, 22], [22, 23], [11, 24]  # Right Foot
+            ]
         self.net = cv2.dnn.readNetFromCaffe(self.protoFile, self.weightsFile)
 
     def load_model(self):
