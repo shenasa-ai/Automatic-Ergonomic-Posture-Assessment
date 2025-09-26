@@ -5,6 +5,7 @@ from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
 
+
 class OpenpifpafPoseDetector(PoseDetector):
     Nose = 0
     LEye = 1
@@ -28,15 +29,14 @@ class OpenpifpafPoseDetector(PoseDetector):
     def __init__(self):
         self.predictor = openpifpaf.Predictor(checkpoint='shufflenetv2k30')
         self.im_skeleton = None
-        #self.image = None
-        
+        # self.image = None
+
     def resize(self, image):
         r = 400.0 / image.shape[0]
         dim = (int(image.shape[1] * r), 400)
         image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
         image = Image.fromarray(image, 'RGB')
         return image, dim
-
 
     def calc_disply_joints(self, prediction):
         plt.imshow(self.image)
@@ -54,7 +54,7 @@ class OpenpifpafPoseDetector(PoseDetector):
                 yy.append(y)
                 zz.append(z)
         im2 = self.image.copy()
-        #plt.sca(axs.flatten()[0])
+        # plt.sca(axs.flatten()[0])
         plt.imshow(im2)
         plt.scatter(xx, yy, s=3)
         plt.title('Joints')
@@ -63,7 +63,7 @@ class OpenpifpafPoseDetector(PoseDetector):
     def preprocess_image(self, image):
         self.image, dim = self.resize(image)
         predictions, gt_anns, image_meta = self.predictor.pil_image(self.image)
-        
+
         pred = []
         for i in predictions:
             pred.append(i.json_data())
@@ -109,4 +109,3 @@ class OpenpifpafPoseDetector(PoseDetector):
                 
                 return points
     '''
-
