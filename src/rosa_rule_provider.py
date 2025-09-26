@@ -753,7 +753,7 @@ class RosaRuleProvider:
         for point in self.points:
             if point:
                 cv2.circle(self.image, point, self.circle_radius, (0, 255, 0), thickness=-1, lineType=cv2.FILLED)
-        cv2.imwrite(f'../joints/{file_name}', self.image)
+        cv2.imwrite(f'../joints/{file_name}', self.image.resize(1920, 1080))
 
     def draw_lines_between_pairs(self, axis, points, color, is_point_pixel=False):
         x = []
