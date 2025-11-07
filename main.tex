@@ -1,0 +1,471 @@
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{adjustbox}
+\usepackage[table]{xcolor}
+\usepackage{tabularx}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{cite}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+
+\definecolor{lightgray}{gray}{0.95}
+\doublespacing
+
+\title{Automated Ergonomic Posture Assessment in Office Environments Using Deep Learning-Based Pose Estimation}
+\author{Ali Yazdanifar}
+\date{May 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Fatigue and pain resulting from Work-Related Musculoskeletal Disorders (WMSDs) represent a significant factor in reducing productivity in work environments. Maintaining proper ergonomic postures in office settings can help prevent these disorders. Continuous exposure to improper body positions, such as incorrect arm angles, neck flexion, or lack of lumbar support, even during non-physical tasks, can lead to cumulative strain and long-term injuries. More than 50\% of all work-related health issues in the European Union are attributed to musculoskeletal disorders, resulting in a 40\% productivity loss \cite{bevan2015economic}. Additionally, it is estimated that the United States pays approximately \$20 billion annually in workers' compensation for musculoskeletal disorders \cite{kang2014prevention}.
+
+% Industries with high exposure to these disorders include hospitality, food production, construction, advanced manufacturing, semiconductors, agriculture, and office workers \cite{chyuan2004musculoskeletal,mehrparvar2011risk,lin2013suitability,naeini2014ergonomics,lu2016risk,he2020visual,menanno2024ergonomic}.
+
+Office workers and individuals employed in administrative environments are also at high risk of these disorders.\cite{menanno2024ergonomic}.
+
+Engineers, designers, architects, and individuals with desk jobs spend an average of 11 hours daily in sedentary positions behind desks \cite{tudor2011time,chu2016systematic,parry2013contribution}.
+
+Furthermore, following the COVID-19 pandemic and shifts in work patterns such as remote work, this number has increased significantly \cite{ricci2020recommendations,xiao2021impacts,awada2021working}.
+
+To identify and evaluate these issues, several ergonomic assessment methods have been developed, including the Rapid Upper Limb Assessment (RULA) \cite{mcatamney1993rula}, Rapid Entire Body Assessment (REBA) \cite{hignett2000reba}, and Rapid Office Strain Assessment (ROSA) \cite{sonne2012rosa}, which systematically analyze risk factors associated with body posture in workplace environments \cite{yang2024systematic}.
+
+For instance, Poochada \& Chaiklieng used the ROSA tool for observational assessment to diagnose and categorize muscular disorder risks into four categories (low, medium, high, very high) after data collection \cite{poochada2015ergonomic}.
+
+Traditional assessment methods, while commonly employed, present several challenges that warrant discussion.
+
+A major limitation is the requirement for specialized experts in this field \cite{paudel2022industrial}. Additionally, while traditional methods are valued for their cost-effectiveness and minimal interference with the work environment \cite{yang2024systematic}, they are susceptible to subjective biases and potential human errors, leading to inconsistent results and poor reproducibility \cite{paudel2022industrial}.
+
+Other limitations of traditional methods include lack of scalability and inability to obtain precise information and detailed body segment data in various postures \cite{yang2024systematic}.
+
+Recent advances in machine learning and computer vision have provided various solutions for detecting and preventing such disorders. Recent advances in machine learning and computer vision have shown promise in addressing some limitations of traditional methods \cite{ANSIHFES1002007}, however, challenges remain in achieving accurate, scalable, and explainable assessment for office environments. \cite{paudel2022industrial}.
+
+Machine learning and image processing-based methods enable automatic, contact-free detection capabilities \cite{yang2024systematic}. In these approaches, data is typically recorded via standard RGB cameras \cite{menanno2024ergonomic}, RGB-D depth sensors/cameras \cite{hossain2023ergonomic}, or stereo cameras \cite{massirisfernandez2020ergonomic}.
+
+Given that a significant portion of contemporary jobs involves prolonged sitting at desks, assessing postural risks in office environments has substantial practical relevance.
+
+% In related studies, the absence of datasets specific to the environment or task under investigation is frequently cited as the primary rationale for data collection as the initial step in many research papers \cite{menanno2024ergonomic}. Since this data plays a crucial role in the evaluation process, the methodology for its collection is also important in certain cases. In office or similar environments such as classrooms, data is typically collected using digital RGB cameras or monitor webcams \cite{chen2019sitting}.
+
+% Following data collection, the investigation process involves several stages. In existing studies, detecting keypoints of individuals' body parts in images or video frames using deep learning pose estimation models such as VideoPose3D \cite{menanno2024ergonomic} or OpenPose \cite{rodrigues2022ergonomic, chen2019sitting} represents a common approach. This extracted information often undergoes preprocessing to ensure the availability of high-quality, noise-free data. The 2D keypoints extracted by the aforementioned models are frequently converted to 3D points using image processing techniques \cite{menanno2024ergonomic} or with assistance from depth data extracted from Kinect sensors \cite{rodrigues2022ergonomic}. At this stage, the information can be used directly by calculating angles between various joints and making decisions regarding body posture using ergonomic tools like RULA \cite{menanno2024ergonomic}.
+
+% Alternatively, additional preprocessing steps such as background removal and region growing can be applied to isolate left and right arms. Subsequently, calibration is performed using manual goniometry data and linear regression, and finally, the normalized angle model serves as input to machine learning models \cite{rodrigues2022ergonomic}.
+
+% Conversely, some approaches focus on applying modifications and cleanup directly to the 2D images themselves, ultimately feeding the preprocessed images as input to models. These methods include resizing, normalization, and data augmentation for input into CNN models \cite{chen2019sitting}.
+
+% Another approach bypasses pre-trained deep models for pose estimation and employs DNNs for feature extraction. In this methodology, images are converted to grayscale, cropped to relevant body regions, and filters such as BandPass along with morphological operations are applied before being fed into deep Dense networks to extract features including texture features, first-order histogram-based features (e.g., mean, standard deviation, skewness, kurtosis, energy, entropy), and second-order grey level co-occurrence matrix (GLCM)-based features (e.g., contrast, correlation, inverse difference moment, variance, cluster prominence, cluster shade, homogeneity). These are then used as input for models determining active or sedentary posture states \cite{guduru2022prediction}.
+
+% \begin{table*}[ht]
+% \centering
+% \caption{Comparison of Methodological Approaches in Ergonomic Assessment Studies}
+% \label{tab:methodology_comparison}
+% \footnotesize
+% \begin{tabular}{@{}p{2.2cm} p{2.8cm} p{2.8cm} p{2.8cm} p{2.8cm} p{2.8cm}@{}}
+% \toprule
+% \textbf{Step} & \textbf{Menanno et al.} & \textbf{Rodrigues et al.} & \textbf{Poochada \& Chaiklieng} & \textbf{Guduru et al.} & \textbf{Chen et al.} \\
+% \midrule
+% \textbf{Data Collection} & 
+% Video recordings of worker activities &
+% Kinect RGB and depth images &
+% ROSA tool and interviews &
+% Intel RealSense camera images &
+% Classroom monitor video \\
+% \addlinespace
+% \textbf{Posture Assessment} & 
+% 3D pose estimation with VideoPose3D &
+% Kinect and OpenPose for joint angles &
+% ROSA-based manual observation &
+% Image feature extraction (DNN) &
+% OpenPose for sitting posture \\
+% \addlinespace
+% \textbf{Risk Evaluation} & 
+% Fuzzy Inference Engine for IcTOT &
+% RULA score with Random Forest &
+% ROSA score classification &
+% DNN for sedentary behavior detection &
+% CNN classification of sitting posture \\
+% \addlinespace
+% \textbf{Feedback/Mitigation} & 
+% Cobot implementation &
+% Continuous feedback &
+% Workplace improvements &
+% Real-time alarm system &
+% Real-time posture feedback \\
+% \addlinespace
+% \textbf{Validation} & 
+% Cobots implementation and reassessment &
+% Manual goniometry and RULA prediction &
+% STATA-based data analysis &
+% Comparison with traditional models &
+% 90\% accuracy after 100 epochs \\
+% \bottomrule
+% \end{tabular}
+% \end{table*}
+
+The datasets used in the reviewed studies were customized and collected using various methodologies. A common approach involves recording images from commercially available RGB cameras such as webcams \cite{chen2019sitting, menanno2024ergonomic}. Additionally, cameras capable of recording depth (RGB-D) \cite{rodrigues2022ergonomic} or LIDAR systems \cite{guduru2022prediction} can be utilized to store supplementary information.
+
+% Table \ref{tab:dataset_comparison} summarizes the information regarding the datasets employed in these studies.
+
+% \begin{table*}[ht]
+% \centering
+% \caption{Dataset Characteristics and Collection Methods Across Reviewed Studies}
+% \label{tab:dataset_comparison}
+% \footnotesize
+% \begin{tabular}{@{}p{2.2cm} p{2.8cm} p{2.8cm} p{2.8cm} p{2.8cm} p{2.8cm}@{}}
+% \toprule
+% \textbf{Step} & \textbf{Menanno et al.} & \textbf{Rodrigues et al.} & \textbf{Poochada \& Chaiklieng} & \textbf{Guduru et al.} & \textbf{Chen et al.} \\
+% \midrule
+% \textbf{Data Collection} & 
+% Videos of manual assembly tasks &
+% RGB and depth images of 20 participants &
+% Survey and observation of call center workers &
+% 300 image samples from 20 subjects &
+% Classroom video footage \\
+% \addlinespace
+% \textbf{Customized Dataset} & 
+% Yes – frames from work cycles &
+% Yes – 2,400 frames selected &
+% Yes – questionnaires and observations &
+% Yes – 225 training, 75 testing samples &
+% Yes – OpenPose features augmented \\
+% \addlinespace
+% \textbf{Data Type} & 
+% Video frames of joint movements &
+% RGB-D sequences with joint angles &
+% Survey responses and scores &
+% Images of sedentary poses &
+% Keypoint-based posture features \\
+% \addlinespace
+% \textbf{Participants} & 
+% Real industrial workers &
+% 20 office workers (8F, 12M) &
+% Call center employees in Thailand &
+% 20 subjects (10M, 10F) &
+% Students in classroom \\
+% \addlinespace
+% \textbf{Data Availability} & 
+% Private, on request &
+% Not specified, likely private &
+% Not specified, likely private &
+% Partial inclusion in paper &
+% Not specified, study only \\
+% \bottomrule
+% \end{tabular}
+% \end{table*}
+
+Based on the reviewed studies, it can be concluded that one of the major challenges in identifying musculoskeletal disorders is the comprehensive monitoring of all body parts over extended periods \cite{rodrigues2022ergonomic}. Additionally, the performance limitations of algorithms when dealing with self-occluded images or those affected by object occlusion (such as legs being occluded by desks or other workplace objects) represent another significant concern \cite{rodrigues2022ergonomic}. Furthermore, environmental variations can substantially impact overall system performance, leading researchers to frequently address this issue by increasing dataset size and diversity—an approach that is often costly \cite{menanno2024ergonomic}. Notably, the use of specialized cameras such as Kinect or RGB-D sensors to obtain complete subject information incurs substantial expenses.
+
+This study introduces a novel methodology that simplifies the detection and prevention of work-related muscle disorders (WMSDs) by eliminating environmental factors and focusing on human elements to reduce challenges such as the existence of back support on the chair or the height and angles of the monitor. Because of differences in devices and environment, we focused on detecting (WMSDs) only on human factors. Using a relatively small collected dataset and leveraging pre-trained deep learning models, the approach accurately identifies musculoskeletal anomalies in office environments according to established standards. Significantly, this research employs commonly available RGB cameras, such as those in mobile phones, which effectively eliminates equipment costs. For the first time in such research, we comprehensively compare three prominent pose estimation models—MediaPipe, OpenPifPaf, and OpenPose—and present comparative results. It is important to note that the collected dataset is not used for model training, thereby eliminating the need for time and computational resources typically required for training, and is solely utilized for threshold determination. Furthermore, we demonstrate that using available joints and implementing a straightforward angle calculation method effectively computes various angles while maintaining compatibility with ROSA guidelines and ANSI standards.
+
+In summary, this study successfully addresses three key challenges: the requirement for extensive and diverse datasets, model sensitivity to environmental conditions, and limitations in comprehensive whole-body assessment, particularly in office environments. 
+% The overall workflow of the proposed methodology is illustrated in Figure \ref{fig:workflow}.
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=1\linewidth]{images/FlowChart.png}
+%     \caption{Proposed Workflow for Ergonomic Posture Assessment}
+%     \label{fig:workflow}
+% \end{figure}
+
+\section{Materials and Methods}
+This study aims to simplify the investigated problem by disregarding environmental factors and utilizing pre-trained models including OpenPose, OpenPifPaf, and Mediapipe to achieve accurate identification of stressed body parts based on ergonomic standards in office environments.
+
+The following main sections are discussed:
+\begin{enumerate}
+    \item Dataset collection
+    \item Data preprocessing and labeling
+    \item Calculating angles of different body parts
+    \item Posture Assessment
+\end{enumerate}
+
+\subsection{Dataset Collection}
+Based on the reviews conducted in the dataset analysis section, the absence of suitable datasets for assessing ergonomic risks in office environments, combined with the influence of cultural factors including diverse clothing for women, made dataset collection essential. Participants consisted of 6 men and 3 women, each assuming multiple sitting postures from both side (n postures) and frontal (m postures) angles in an office environment.
+
+During collection, the camera angle remained fixed while the distance from subjects to the camera varied. Given the importance of background and its impact on model output, efforts were made to incorporate diverse backgrounds in the data recording process. Subject clothing also influences model output, thus considerations such as wearing masks, hijabs, and varying ambient lighting conditions were incorporated during collection. The collected images have a 4K resolution.
+
+In total, 344 images from the side angle and 190 images from the frontal angle were collected.
+
+\subsubsection{Camera Placement and Positioning}
+This section examines the distance and angle of camera placement. First, existing ergonomic standards are reviewed, and the necessity of angle calculation is explained. Subsequently, the method of angle calculation is briefly discussed. Finally, the effect of camera placement on calculated angles is examined.
+
+\subsubsection{Examining the Effect of Distance on Calculated Angles}
+In Figure \ref{fig:dist-comp}, a person is shown at two different distances. Comparison of the two images demonstrates that changing camera distance leaves angles approximately constant and independent of distance.
+
+\subsubsection{Examining the Effect of Horizontal Camera Rotation Relative to Person on Calculated Angles}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/image.png}
+    \caption{Horizontal Camera Rotation Effects}
+    \label{fig:hor-rot}
+\end{figure}
+
+In Figure \ref{fig:hor-rot}, angles for one person are calculated in each row where the camera has changed position at a constant height relative to the horizon. The image demonstrates that camera rotation significantly affects angles, suggesting that the camera should be installed in a specific location for all users. It should be noted that in most cases, when the camera moves slightly inclined toward the person's face along the horizon, the model provides better point estimation. This issue can be resolved by obtaining an offset empirically.
+
+\subsubsection{Examining the Effect of Vertical Camera Rotation (Height Change) Relative to Person on Calculated Angles}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/image.png}
+    \caption{Vertical Camera Rotation Effects}
+    \label{fig:hig-comp}
+\end{figure}
+
+In Figure \ref{fig:hig-comp}, angles for one person are calculated in each row where the camera is placed at different heights. According to the image, changing height does not significantly affect calculated angles.
+
+\subsubsection{Camera Specifications}
+As mentioned, test data for this report were collected with an iPhone 6 camera. Different cameras vary in terms of: a) resolution and b) differences in image length and width.
+a) Resolution: In section 2.4 (Resizing input images), resizing an image to one-quarter of the input size and thus reducing resolution does not negatively impact model point estimation.
+b) Difference in image length and width: If the image is very wide on a camera, or the distance is substantial, resizing the entire image to a predetermined size might make the person's image within it very small. Simple solutions exist for this problem. Resizing can be performed relative to a body part that is clear in the image.
+
+\subsubsection{Environmental Characteristics}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/env-features.png}
+    \caption{Environmental Effects on Pose Estimation}
+    \label{fig:env-effect}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/darkimg.png}
+    \caption{Lighting Condition Effects}
+    \label{fig:light-effects}
+\end{figure}
+
+The images discussed thus far feature different people with varied clothing and diverse backgrounds, including individuals wearing masks. As evident, the model provides reasonable joint estimation in all these images. Certainly, cases exist where the model cannot estimate joints (such as Figure \ref{fig:env-effect}), but these appear negligible.
+We must also consider that while the model is not sensitive to ambient light, the ambient lighting should be sufficient to ensure the person is clearly visible in the image; in the figure below, due to window lighting, the model does not function correctly in point estimation (Figure \ref{fig:light-effects}).
+
+\subsection{Applied Rules and Standards}
+Based on review of existing regulations, the ROSA guidelines and the ANSI/HFES 100-2007 standard \cite{ANSIHFES1002007} have established guidelines for proper body posture in office environments. The ANSI standard provides detailed specifications for computer design and configuration in workplaces. ROSA is a pictorial checklist that has developed rules for rapid assessment and scoring of existing risks in work environments. The rules employed in this review represent a combination of both these guidelines and standards. Certain aspects have been omitted. For example, in the ROSA rule set, environmental factors such as chair height, seat area, armrest height, or keyboard height contribute to scoring. Since modifying environmental factors incurs costs, our focus remains on human factors. It is worth noting that postures not specified in the rules, such as crossing one leg over the other, have not been discussed. Angles such as back, arms, and neck can exhibit anomalies from both frontal and side perspectives. Therefore, for more accurate assessment, we examine such angles separately once from the frontal view and once from the side view.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/ansi.png}
+    \caption{Ergonomic Standards and Angle Measurements}
+    \label{fig:ansi}
+\end{figure}
+
+As observed in Figure \ref{fig:ansi}, these angles are considered from both side (side view) and front (frontal view) perspectives. By considering a camera from the side, the first 4 angles can be calculated. Given the obtained points mentioned in section 2, the whole-body OpenPifPaf and Mediapipe models estimate wrist and fingertip points, but these models were found to perform inadequately in images with cluttered backgrounds. It appears preferable to avoid calculating and evaluating angle 5-d in the initial phase. The angle evaluated in image 5-e requires a front view, making a second camera essential for calculating this angle. It should be noted that finding this angle requires elbow, shoulder, and waist joints. If this camera is considered a webcam, from this camera's perspective, waist points and potentially arm points are not visible. Therefore, omitting calculation of this angle is recommended.
+
+\subsection{Calculating Angles Using Coordinates Returned by Model}
+Each angle comprises two lines. Vectors corresponding to each line can be calculated from two points returned by the model. Given two vectors, the angle between them can be calculated using the following formula:
+
+\[
+\theta = \arccos\!\left( \frac{\mathbf{v}_1 \cdot \mathbf{v}_2}{\lVert \mathbf{v}_1 \rVert \, \lVert \mathbf{v}_2 \rVert} \right)
+\]
+
+where
+\begin{itemize}
+    \item $\theta$ denotes the angle between the two vectors,
+    \item $\mathbf{v}_1, \mathbf{v}_2 \in \mathbb{R}^n$ are vectors in $n$-dimensional space,
+    \item $\mathbf{v}_1 \cdot \mathbf{v}_2$ is the dot product of $\mathbf{v}_1$ and $\mathbf{v}_2$,
+    \item $\lVert \mathbf{v}_i \rVert = \sqrt{\mathbf{v}_i \cdot \mathbf{v}_i}$ denotes the Euclidean norm of vector $\mathbf{v}_i$ for $i \in \{1,2\}$,
+    \item $\arccos(\cdot)$ is the inverse cosine function.
+\end{itemize}
+
+Where $\mathbf{v}_1$ and $\mathbf{v}_2$ are the target vectors, $\arccos$ is the inverse cosine, and $\theta$ is the desired angle.
+
+\subsection{Data Preprocessing and Labeling}
+In this section, with input from three ergonomists, data were labeled in two categories.
+Side angle data were scored for knee (score 1 or 2), back (score 1 or 2), and neck (score 1, 2, and 3) with kappa coefficients of 74.3\%, 80.9\%, and 64.5\%, respectively. Similarly, for frontal angle data, including neck (score 1 or 2), arms (score 1, 2, and 3), and trunk (score 1 and 2), they were scored with kappa coefficients of 88\%, 79\%, and 85\%, respectively. The kappa coefficient was calculated according to the following formula:
+\[
+\kappa = \frac{p_o - p_e}{1 - p_e}
+\]
+
+where
+
+\[
+p_o = \frac{\sum_{i=1}^k n_{ii}}{N}, \quad
+p_e = \sum_{i=1}^k \left( \frac{n_{i\cdot}}{N} \cdot \frac{n_{\cdot i}}{N} \right)
+\]
+
+\noindent
+\textbf{Explanation:}
+\begin{itemize}
+    \item $\kappa$: Cohen's Kappa coefficient.
+    \item $p_o$: observed agreement, calculated as the proportion of instances where raters agree.
+    \item $p_e$: expected agreement by chance, computed from the marginal totals of the confusion matrix.
+    \item $n_{ii}$: number of samples where both raters agree on category $i$ (diagonal elements).
+    \item $n_{i\cdot}$: total number of samples assigned to category $i$ by rater A (row sums).
+    \item $n_{\cdot i}$: total number of samples assigned to category $i$ by rater B (column sums).
+    \item $N$: total number of samples.
+\end{itemize}
+
+All data recorded in laboratory environments and via mobile phone cameras were recorded and stored in RGB image format.
+To preserve privacy, in collected images, faces were detected and blurred using image processing techniques.
+
+\subsection{Model Selection}
+To identify the suitable model, other parameters such as distance from camera to person, camera direction relative to person, and input image size were held constant.
+It should be noted that all images in this report were captured with an iPhone 6 camera. The impact of camera specifications on this evaluation will be examined in subsequent sections.
+The input image was considered relatively complex, with the person wearing a mask and their clothing somewhat similar to the background in the head region.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/f4a.png}
+    \caption{MediaPipe Performance with Different Confidence Thresholds}
+    \label{fig:f4a}
+\end{figure}
+
+In Figure \ref{fig:f4a}, the Mediapipe model was applied to the input with 4 different confidence parameters. As observed, if this parameter is set to 0.9, no joints are obtained, and the points obtained at values 0.5, 0.6, and 0.7 are identical.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/f4b.png}
+    \caption{OpenPifPaf Model Comparisons}
+    \label{fig:f4b}
+\end{figure}
+
+In Figure \ref{fig:f4b}, different models from the OpenPifPaf library were applied to the image. As evident, the whole-body models do not perform well in cluttered backgrounds. Between the tshufflenetv2k16 and tshufflenetv2k30 models, the latter performs better and returns more points.
+Comparing the shufflenetv2k30 model from the OpenPifPaf library and the Mediapipe model, it can be stated that Mediapipe returns more points, but the accuracy of points obtained by the OpenPifPaf model is higher. (Please note the elbow and waist points in both models.)
+
+Therefore, based on the conducted evaluations, the shufflenetv2k30 model from the OpenPifPaf library is the most suitable model for this project.
+
+\subsection{Input Image Size}
+Based on previous experiences, input image size affects model accuracy and speed. In this section, the OpenPifPaf shufflenetv2k30 model is considered, and the input is resized with different values to examine model accuracy and speed.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/speed comparing.png}
+    \caption{Performance Comparison Across Input Sizes}
+    \label{fig:performance}
+\end{figure}
+
+As observed in Figure \ref{fig:performance}, reducing input size results in more points being obtained while simultaneously reducing processing speed.
+
+\subsection{Calculating Angles of Different Body Parts}
+
+The overall assessment process comprises three components:
+\begin{enumerate}
+    \item Utilizing pre-trained pose models to extract keypoints.
+    \item Calculating angles based on standards mentioned in section 2.2.
+    \item Comparing and calculating equivalent angles according to ergonomic rules.
+    \item Scoring based on existing rules.
+\end{enumerate}
+
+In this assessment, for comparison purposes and to achieve maximum efficiency, OpenPose, OpenPifPaf, and MediaPipe models were employed as pre-trained models, with results from each examined separately.
+In this assessment, each input image or video frame is resized and then fed to the relevant model to extract body keypoints.
+
+It is noteworthy that in side view assessment, body posture can be monitored from both left and right angles. In this study, angles under examination from the side view were assessed from the left side.
+
+Subsequently, the following angles are obtained for scoring based on standards in section 2.2:
+\begin{itemize}
+    \item Knee angle: This angle is calculated using the angle formed by connecting ankle to knee and knee to hip.
+    \item Back angle: To calculate this angle, the midpoint between the two shoulders is calculated by averaging the distance between the two shoulders. This obtained point is then connected to the hip and subsequently to the knee, and the aforementioned angle is calculated.
+    \item Neck angle: To calculate this angle, due to the absence of an independent neck keypoint, the angle formed by connecting ear to shoulder and then considering a hypothetical point with x equal to shoulder's x and y equal to ear's y is calculated.
+\end{itemize}
+These angles are visible in Figure \ref{fig:side}.
+Similarly, the following angles were calculated for the frontal section:
+\begin{itemize}
+    \item Neck angle: To calculate this angle, since no independent keypoint existed for the neck, the angle formed by the line passing through the point resulting from the difference between the two eyes' locations and the line passing through the point resulting from the difference between the two shoulders was considered as the neck angle under examination.
+    \item Arms: To calculate arm angle from the front view, calculating angles of both arms is necessary. Therefore, for each arm, the angle consisting of the connection of shoulder, elbow, and hip (right/left) is calculated.
+    \item Trunk angle: To calculate this angle, two main components are used: shoulders, hips, and the vertical line. To obtain the precise position of this component, it is first verified whether both shoulders and both hips have been detected correctly. If all mentioned members are correctly detected, the maximum angle between the right shoulder, right hip, and the vertical line and the left shoulder, left hip, and the left vertical line is considered as the reference angle.
+    If any of these members are missing, the shoulder and hip of the side that is completely detected, along with the vertical line, are considered.
+\end{itemize}
+These angles are visible in Figure \ref{fig:front}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/front_0.JPG}
+    \caption{Front View Angle Measurements}
+    \label{fig:front}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/side_0.JPG}
+    \caption{Side View Angle Measurements}
+    \label{fig:side}
+\end{figure}
+
+Subsequently, approximate thresholds for each angle were calculated.
+
+\section{Conclusion}
+
+\begin{table*}[ht]
+\centering
+\caption{Performance Comparison of Pose Estimation Models Across Different Viewpoints and Body Angles}
+\label{tab:model_performance}
+\small
+\begin{tabular}{@{}l l l c c c c c@{}}
+\toprule
+\textbf{Model} & \textbf{Viewpoint} & \textbf{Angle} & \textbf{Accuracy} & \textbf{F1-Score} & \textbf{Precision} & \textbf{Recall} & \textbf{MCC} \\
+\midrule
+\multirow{6}{*}{MediaPipe}
+& \multirow{3}{*}{Front} & Trunk & 0.489 & 0.514 & \textbf{0.922} & 0.356 & 0.245 \\
+& & Arm & 0.569 & 0.575 & 0.587 & 0.569 & 0.320 \\
+& & Neck & 0.895 & 0.929 & 0.872 & \textbf{0.992} & 0.754 \\
+\cmidrule{2-8}
+& \multirow{3}{*}{Side} & Chair & 0.689 & 0.582 & 0.541 & 0.631 & 0.339 \\
+& & Back & 0.807 & 0.848 & 0.834 & 0.862 & 0.586 \\
+& & Monitor & 0.714 & 0.768 & 0.731 & 0.809 & 0.401 \\
+\midrule
+\multirow{6}{*}{OpenPifPaf}
+& \multirow{3}{*}{Front} & Trunk & \textbf{0.905} & \textbf{0.936} & \textbf{0.936} & \textbf{0.936} & \textbf{0.753} \\
+& & Arm & \textbf{0.795} & \textbf{0.792} & \textbf{0.800} & \textbf{0.795} & \textbf{0.675} \\
+& & Neck & \textbf{0.937} & \textbf{0.956} & 0.922 & \textbf{0.992} & \textbf{0.852} \\
+\cmidrule{2-8}
+& \multirow{3}{*}{Side} & Chair & \textbf{0.841} & \textbf{0.810} & 0.694 & \textbf{0.971} & \textbf{0.708} \\
+& & Back & \textbf{0.887} & \textbf{0.907} & \textbf{0.897} & \textbf{0.917} & \textbf{0.764} \\
+& & Monitor & \textbf{0.735} & \textbf{0.792} & \textbf{0.717} & \textbf{0.886} & \textbf{0.457} \\
+\midrule
+\multirow{6}{*}{OpenPose}
+& \multirow{3}{*}{Front} & Trunk & 0.892 & 0.926 & 0.930 & 0.922 & 0.726 \\
+& & Arm & 0.682 & 0.685 & 0.691 & 0.682 & 0.489 \\
+& & Neck & 0.779 & 0.838 & \textbf{0.845} & 0.832 & 0.489 \\
+\cmidrule{2-8}
+& \multirow{3}{*}{Side} & Chair & 0.695 & 0.647 & 0.561 & 0.765 & 0.405 \\
+& & Back & 0.837 & 0.869 & 0.839 & 0.900 & 0.656 \\
+& & Monitor & 0.716 & 0.769 & 0.693 & 0.865 & 0.429 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[htbp]
+\centering
+\caption{Overall Performance Summary by Model}
+\label{tab:overall_summary}
+\small
+\begin{tabular}{@{}l c c c c c@{}}
+\toprule
+\textbf{Model} & \textbf{Acc.} & \textbf{F1} & \textbf{Prec.} & \textbf{Rec.} & \textbf{MCC} \\
+\midrule
+MediaPipe & 0.693 & 0.706 & \textbf{0.748} & 0.703 & 0.441 \\
+OpenPifPaf & \textbf{0.850} & \textbf{0.865} & 0.828 & \textbf{0.916} & \textbf{0.718} \\
+OpenPose & 0.767 & 0.789 & 0.760 & 0.827 & 0.532 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Based on the comprehensive evaluation presented in Tables \ref{tab:model_performance} and \ref{tab:overall_summary}, several key findings emerge regarding the performance of different pose estimation models for ergonomic assessment.
+
+Table \ref{tab:model_performance} provides a detailed comparison across different viewpoints and body angles, revealing that OpenPifPaf consistently demonstrates superior performance across most metrics and body segments. The model achieves particularly strong results in frontal view assessments, with accuracy values of \textbf{0.905} for trunk angles, \textbf{0.795} for arm angles, and \textbf{0.937} for neck angles. The corresponding F1-scores of \textbf{0.936}, \textbf{0.792}, and \textbf{0.956} further confirm its robustness in frontal posture evaluation.
+
+In side view assessments, OpenPifPaf maintains its performance advantage, achieving accuracy values of \textbf{0.841} for chair-related angles, \textbf{0.887} for back angles, and \textbf{0.735} for monitor viewing angles. The model's strong performance in back angle assessment (F1-score: \textbf{0.907}) is particularly noteworthy given the importance of spinal posture in ergonomic evaluations.
+
+The overall performance summary in Table \ref{tab:overall_summary} clearly demonstrates OpenPifPaf's superiority, with mean accuracy of \textbf{0.850}, mean F1-score of \textbf{0.865}, and mean Matthews Correlation Coefficient (MCC) of \textbf{0.718}. These results significantly outperform both MediaPipe (mean accuracy: 0.693, mean F1-score: 0.706) and OpenPose (mean accuracy: 0.767, mean F1-score: 0.789).
+
+Notably, OpenPifPaf exhibits exceptional recall performance (mean recall: \textbf{0.916}), indicating its strength in correctly identifying true positive cases of improper posture. This characteristic is particularly valuable in preventive ergonomic applications where missing actual risk factors could have significant consequences for workplace health and safety.
+
+The results also highlight specific challenges in ergonomic assessment. All models showed relatively lower performance in arm angle estimation compared to other body segments, suggesting this represents a more complex detection task. Additionally, the variation in performance between frontal and side viewpoints underscores the importance of multi-perspective analysis in comprehensive ergonomic evaluation.
+
+These findings have practical implications for the implementation of automated ergonomic assessment systems in office environments. The demonstrated performance levels, particularly for the OpenPifPaf model, suggest that computer vision-based approaches can provide reliable, objective posture assessment that addresses the limitations of traditional manual methods while offering scalability and continuous monitoring capabilities.
+
+\bibliographystyle{IEEEtran}
+\bibliography{sources.bib}
+\end{document}
