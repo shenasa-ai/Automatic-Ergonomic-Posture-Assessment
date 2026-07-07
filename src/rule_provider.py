@@ -7,6 +7,7 @@ import numpy as np
 from pose_detector import PoseDetector
 from matplotlib import pyplot as plt
 from face_blurring import FaceBlurring
+from heatmap_generator import HeatmapGenerator
 import cv2
 import matplotlib.pyplot as plt
 
@@ -41,6 +42,7 @@ class RuleProvider:
         self.camera_view_point = "front"
         self.th = 0
         self.resize_factor = 1
+        self.heatmap_generator = HeatmapGenerator()
 
     def get_labels(self, file_name):
         labels = dict()
@@ -56,6 +58,7 @@ class RuleProvider:
         self.result['image_number'].append(file_name.split(sep='.')[0].split(sep='_')[1])
         self.description = ""
         self.image = image
+        self.original_image = image.copy()  # untouched frame, no joints/vectors drawn on it
         self.points = points
         self.camera_view_point = view_point
         self.output_path = output_path
@@ -121,6 +124,17 @@ class RuleProvider:
         else:
             print(f'arm score is: {arm_score}\n'
                   f'phone score is: {phone_score}\n')
+
+        # Optional risk heatmap overlay (abstract/decoupled feature, does not
+        # affect scoring or existing outputs). Built on top of the pristine
+        # original image (no joint points/vectors/annotations on it), and
+        # saved to its own separate output location.
+        if self.camera_view_point == 'side':
+            heatmap_scores = {'chair': chair_score, 'back': backrest_score, 'monitor': monitor_score}
+        else:
+            heatmap_scores = {'arm': arm_score, 'neck': phone_score, 'trunk': trunk_score}
+        self.heatmap_generator.generate(self.original_image, self.points, self.pose_detector, heatmap_scores,
+                                        output_path=f'{self.output_path}/heatmaps', file_name=self.file_name)
 
         return posture_status
 
