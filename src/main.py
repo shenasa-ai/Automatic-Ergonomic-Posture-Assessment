@@ -9,10 +9,10 @@ from mediapipe_pose_detector import MediapipePoseDetector
 from openpifpaf_pose_detector import OpenpifpafPoseDetector
 from rule_provider import RuleProvider
 
-deep_model = "openpose" #"Mediapipe" #"Openpifpaf"  #"openpose"
+deep_model = "Openpifpaf" #"Mediapipe" #"Openpifpaf"  #"openpose"
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--input_path', default='/home/ali/Desktop/testbody/front', help='path to input directory')
+parser.add_argument('--input_path', default='/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/input/main_input/side', help='path to input directory')
 parser.add_argument('--output_path', default=f'../output/{deep_model}_front', help='path to output directory')
 parser.add_argument('--frame_rate', default=10, help='video frame rate')
 parser.add_argument('--front_labels_path', default='front_labels.csv', help='front labels path')
@@ -27,13 +27,11 @@ def assess_posture(root_dir, camera_view_point, pose_detector, rosa_rule_provide
         file_name = os.fsdecode(file)
         #file_name = os.path.splitext(file_name)[0]
         image = cv2.imread(f'{root_dir}/{file_name}')
-        # if file == 'side_30.jpg':
-            # import pudb; pu.db
         resized_image = pose_detector.preprocess_image(image)
         points = pose_detector.get_joint_points()
-        img = draw_skeleton(points, model="openpose25", image_size=(480,640), scale=1)
-        cv2.imwrite("skeleton_example.png", img)
-        # position_status = rosa_rule_provider.get_posture_status(resized_image, points, file_name, camera_view_point, args.output_path, args.front_labels_path, args.side_labels_path)
+        # img = draw_skeleton(points, model="openpose25", image_size=(480,640), scale=1)
+        # cv2.imwrite("skeleton_example.png", img)
+        position_status = rosa_rule_provider.get_posture_status(resized_image, points, file_name, camera_view_point, args.output_path, args.front_labels_path, args.side_labels_path)
         # rosa_rule_provider.save_image(position_status, args.output_path, file_name)
         print('*******************************************************************************************')
     pd.DataFrame({k: pd.Series(v) for k, v in rosa_rule_provider.result.items()}).to_csv(f'./../output/pred_{deep_model}_front.csv', index=False)
