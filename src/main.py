@@ -13,7 +13,7 @@ deep_model = "Openpifpaf" #"Mediapipe" #"Openpifpaf"  #"openpose"
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_path', default='/home/ali/Desktop/Automatic-Ergonomic-Posture-Assessment/input/main_input/side', help='path to input directory')
-parser.add_argument('--output_path', default=f'../output/{deep_model}_front', help='path to output directory')
+parser.add_argument('--output_path', default=f'../PaperImages/', help='path to output directory')
 parser.add_argument('--frame_rate', default=10, help='video frame rate')
 parser.add_argument('--front_labels_path', default='front_labels.csv', help='front labels path')
 parser.add_argument('--side_labels_path', default='side_labels.csv', help='side labels path')
