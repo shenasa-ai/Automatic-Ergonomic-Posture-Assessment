@@ -434,7 +434,8 @@ class RuleProvider:
                     # self.draw_lines_between_pairs(l_hip_shoulder_ear_points)
                     self.description = self.description + f'Neck is NORMAL from left side view - ' \
                                                           f'left hip_shoulder_ear angle: {l_ear_shoulder_vertical_angle} \n'
-                self.draw_lines_between_pairs(axis, l_ear_shoulder_vertical_points, c)
+                self.draw_lines_between_pairs(axis, [self.pose_detector.LEar, self.pose_detector.LShoulder], c)
+                self.draw_lines_between_pairs(axis, [self.pose_detector.LShoulder, -1], 'red', linestyle=':')
                 self.put_text_add_description(axis, self.output_path, self.file_name, 'neck angle',
                                               l_ear_shoulder_vertical_angle, c)
             # # import pudb; pu.db
@@ -454,49 +455,43 @@ class RuleProvider:
         phone_score = 1
         self.get_blure_image()
         axis = self.axs_front[1]
-        self.axs_front[1].set_title('Phone Score')
+        self.axs_front[1].set_title('phone_score')
         self.axs_front[1].axis('off')
-        axis.imshow(self.blured_image)
-
-        # import pudb; pu.db
-        angle_between_shoulders_and_eyes = self.get_angle_between_shoulders_and_eyes()
-
-        two_eyes_points = [self.pose_detector.LEye, self.pose_detector.REye]
-        two_shoulders_points = [self.pose_detector.LShoulder, self.pose_detector.RShoulder]
-        # import pudb; pu.db
+        # axis.imshow(self.blured_image)
+        axis.imshow(self.resize(self.blured_image))
+        two_eyes_two_shoulders_angle = self.get_angle_between_shoulders_and_eyes()
+        two_eyes_points = [self.pose_detector.REye, self.pose_detector.LEye]
+        two_shoulders_points = [self.pose_detector.RShoulder, self.pose_detector.LShoulder]
+        two_eyes_vertical_axis_angle = self.get_r_eye_l_eye_vertical_axis_angle()
+        two_shoulders_vertical_axis_angle = self.get_r_shoulder_l_shoulder_vertical_axis_angle()
+        # if two_eyes_two_shoulders_angle:
         #    if math.fabs(two_eyes_vertical_axis_angle - two_shoulders_vertical_axis_angle) > 30:
-        if angle_between_shoulders_and_eyes is not None:
-            if angle_between_shoulders_and_eyes > 16:
-                c = 'red'
+        if two_eyes_two_shoulders_angle:
+            # if math.fabs(two_eyes_two_shoulders_angle) > 30:
+            if math.fabs(two_eyes_two_shoulders_angle) > 20:
                 phone_score += 1
-                self.description = self.description + f'Neck is BENT LEFTWARD from front view - ' \
-                                                      f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
-            # elif 120 < angle_between_shoulders_and_eyes < 150:
-            #     c = 'red'
-            #     phone_score += 1
-            #     self.description = self.description + f'Neck is BENT RIGHTWARD from front view - ' \
-            #                                           f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
+                c = 'red'
+                self.description = self.description + f'Neck is TWISTED / BENT SIDEWAYS - ' \
+                                                      f'angle between eyes and shoulders: {two_eyes_two_shoulders_angle}\n'
             else:
                 c = 'green'
-                self.description = self.description + f'Neck is not BENT RIGHTWARD or leftward - ' \
-                                                      f'angle_between_shoulders_and_eyes: {angle_between_shoulders_and_eyes} \n'
+                self.description = self.description + f'Neck is NOT TWISTED / BENT SIDEWAYS - ' \
+                                                      f'angle between eyes and shoulders: {two_eyes_two_shoulders_angle}\n'
 
             self.draw_lines_between_pairs(axis, two_eyes_points, c)
             self.draw_lines_between_pairs(axis, two_shoulders_points, c)
-            self.put_text_add_description(axis, self.output_path, self.file_name,
-                                          'angle between 2 \n eyes and 2 shoulders', angle_between_shoulders_and_eyes,
-                                          c)
+            self.put_text_add_description(axis, self.output_path, self.file_name, 'neck angle',
+                                          two_eyes_two_shoulders_angle, c, 10, 30)
+            # import pudb; pu.db
             self.put_score_label(axis, 'phone', phone_score,
-                                 self.labels[self.file_name][2])
+                                 self.labels[self.file_name][1])
         else:
             print("Not Enough Info")
             self.put_text_add_description(axis, self.output_path, self.file_name, "Not Enough Info", None, 'red')
-            monitor_score = None
-
-            # return monitor_score
-
-        # import pudb; pu.db
-        self.result['neck_angle'].append(angle_between_shoulders_and_eyes)
+            phone_score = None
+            # import pudb; pu.db
+            # axis.imshow(self.blured_image)
+        self.result['phone_angle'].append(two_eyes_two_shoulders_angle)
         return phone_score
 
     #############################################################################################
@@ -535,8 +530,10 @@ class RuleProvider:
                     c = 'red'
                 else:
                     c = 'green'
-                self.draw_lines_between_pairs(axis, r_shoulder_hip_vertical_points, c, True)
-                self.draw_lines_between_pairs(axis, l_shoulder_hip_vertical_points, c, True)
+                self.draw_lines_between_pairs(axis, r_shoulder_hip_vertical_points[:2], c, True)
+                self.draw_lines_between_pairs(axis, r_shoulder_hip_vertical_points[1:], 'red', True, linestyle=':')
+                self.draw_lines_between_pairs(axis, l_shoulder_hip_vertical_points[:2], c, True)
+                self.draw_lines_between_pairs(axis, l_shoulder_hip_vertical_points[1:], 'red', True, linestyle=':')
                 self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_r',
                                               r_shoulder_hip_vertical_angle, c, 9, 30)
                 self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_l',
@@ -548,7 +545,8 @@ class RuleProvider:
                     c = 'red'
                 else:
                     c = 'green'
-                self.draw_lines_between_pairs(axis, r_shoulder_hip_vertical_points, c, True)
+                self.draw_lines_between_pairs(axis, r_shoulder_hip_vertical_points[:2], c, True)
+                self.draw_lines_between_pairs(axis, r_shoulder_hip_vertical_points[1:], 'red', True, linestyle=':')
                 self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_r',
                                               r_shoulder_hip_vertical_angle, c, 9, 30)
             elif l_shoulder_hip_vertical_angle:
@@ -557,7 +555,8 @@ class RuleProvider:
                     c = 'red'
                 else:
                     c = 'green'
-                self.draw_lines_between_pairs(axis, l_shoulder_hip_vertical_points, c, True)
+                self.draw_lines_between_pairs(axis, l_shoulder_hip_vertical_points[:2], c, True)
+                self.draw_lines_between_pairs(axis, l_shoulder_hip_vertical_points[1:], 'red', True, linestyle=':')
                 self.put_text_add_description(axis, self.output_path, self.file_name, 'back angle_l',
                                               l_shoulder_hip_vertical_angle, c, 9, 30)
 
@@ -804,7 +803,7 @@ class RuleProvider:
                 cv2.circle(self.image, point, self.circle_radius, (0, 255, 0), thickness=-1, lineType=cv2.FILLED)
         cv2.imwrite(f'../joints/{file_name}', self.image)
 
-    def draw_lines_between_pairs(self, axis, points, color, is_point_pixel=False):
+    def draw_lines_between_pairs(self, axis, points, color, is_point_pixel=False, linestyle='-'):
         x = []
         y = []
         for point in points:
@@ -816,7 +815,7 @@ class RuleProvider:
                 y.append(point[1])
 
         # import pudb; pu.db
-        axis.plot(list(np.array(x) * self.resize_factor), list(np.array(y) * self.resize_factor), c=color)
+        axis.plot(list(np.array(x) * self.resize_factor), list(np.array(y) * self.resize_factor), c=color, linestyle=linestyle)
 
     def get_blure_image(self):
         # import pudb; pu.db
@@ -837,14 +836,7 @@ class RuleProvider:
         text_file.close()
 
     def put_score_label(self, axis, rule, score, label, x=1):
-        axis.text(10, int(self.image.shape[0] - 10 * x * self.resize_factor),
-                  f'{rule} score: {score}' + '\n' + f'label: {label}')
-        if score == label:
-            main_label = 'True'
-        else:
-            main_label = 'False'
-        axis.text(10, int(self.image.shape[0] + 50 * x * self.resize_factor), f'{main_label}')
-        # axis.text(int(self.image.shape[1] - 50) , int(self.image.shape[0] - 10 * x  * self.resize_factor) , f'label: {label}')
+        pass
 
     def resize(self, image):
         return cv2.resize(image, None, fx=self.resize_factor, fy=self.resize_factor)

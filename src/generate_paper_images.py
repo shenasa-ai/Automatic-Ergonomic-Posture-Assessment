@@ -208,8 +208,8 @@ def draw_styled_joint(img, pt, color=(0, 255, 255), radius=8, outline_color=(15,
     cv2.circle(img, (x, y), max(2, radius // 4), (255, 255, 255), -1, cv2.LINE_AA)
 
 
-def draw_dashed_line(img, pt1, pt2, color, thickness=2, dash_length=12):
-    """Draws an anti-aliased dashed reference line between two points."""
+def draw_dashed_line(img, pt1, pt2, color=(0, 0, 255), thickness=2, dash_length=12):
+    """Draws an anti-aliased dashed reference line between two points in red."""
     p1 = np.array(pt1, dtype=float)
     p2 = np.array(pt2, dtype=float)
     dist = np.linalg.norm(p2 - p1)
@@ -404,11 +404,6 @@ def generate_joint_extracted_image(original_bgr: np.ndarray, points: list, keypo
                            bg_color=(20, 24, 32, 210), border_color=border_rgba,
                            padding=badge_pad, radius=max(3, int(4 * scale)))
                            
-    # Title banner in top-left
-    draw_pil_badge(draw, "1. Joint Extraction (High-Resolution)", (int(25 * scale), int(25 * scale)),
-                   title_font, text_color=(255, 255, 255, 255), bg_color=(15, 25, 45, 230),
-                   border_color=(0, 220, 255, 255), padding=int(10 * scale), radius=int(6 * scale))
-                   
     combined = Image.alpha_composite(pil_img, overlay).convert("RGB")
     return cv2.cvtColor(np.array(combined), cv2.COLOR_RGB2BGR)
 
@@ -488,18 +483,7 @@ def generate_vector_extracted_image(original_bgr: np.ndarray, points: list, keyp
         if pt is not None:
             draw_styled_joint(img, pt, color=(240, 240, 240), radius=radius, outline_thick=max(1, thick // 2))
             
-    # Render crisp title banner using PIL
-    pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)).convert("RGBA")
-    overlay = Image.new("RGBA", pil_img.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(overlay)
-    title_font = get_font(max(16, int(round(20 * scale))), bold=True)
-    
-    draw_pil_badge(draw, "2. Vector Extraction & Kinematic Chains", (int(25 * scale), int(25 * scale)),
-                   title_font, text_color=(255, 255, 255, 255), bg_color=(15, 25, 45, 230),
-                   border_color=(0, 255, 128, 255), padding=int(10 * scale), radius=int(6 * scale))
-                   
-    combined = Image.alpha_composite(pil_img, overlay).convert("RGB")
-    return cv2.cvtColor(np.array(combined), cv2.COLOR_RGB2BGR)
+    return img
 
 
 # ---------------------------------------------------------------------------
@@ -591,9 +575,9 @@ def generate_angle_calculated_image(original_bgr: np.ndarray, points: list, dete
             status_text = "OPTIMAL" if is_optimal else "RISK"
             
             draw_styled_vector(img, hip, sho, color=(210, 210, 210), thickness=thick)
-            draw_dashed_line(img, hip, v_horiz_ref, color=(180, 180, 180), thickness=max(1, thick - 1))
+            draw_dashed_line(img, hip, v_horiz_ref, color=(0, 0, 255), thickness=max(1, thick - 1))
             v_vert_ref = (hip[0], hip[1] - int(130 * scale))
-            draw_dashed_line(img, hip, v_vert_ref, color=(140, 140, 140), thickness=max(1, thick - 1))
+            draw_dashed_line(img, hip, v_vert_ref, color=(0, 0, 255), thickness=max(1, thick - 1))
             draw_angle_arc(img, hip, sho, v_horiz_ref, radius=arc_radius, color=status_color_bgr, thickness=thick)
             
             badge_pos = (hip[0] - int(250 * scale), hip[1] - int(30 * scale))
@@ -614,7 +598,7 @@ def generate_angle_calculated_image(original_bgr: np.ndarray, points: list, dete
             status_text = "OPTIMAL" if is_optimal else "BENT FORWARD"
             
             draw_styled_vector(img, sho, ear, color=(210, 210, 210), thickness=thick)
-            draw_dashed_line(img, sho, vert_ref_point, color=(180, 180, 180), thickness=max(1, thick - 1))
+            draw_dashed_line(img, sho, vert_ref_point, color=(0, 0, 255), thickness=max(1, thick - 1))
             draw_angle_arc(img, sho, ear, vert_ref_point, radius=int(arc_radius * 0.8), color=status_color_bgr, thickness=thick)
             
             badge_pos = (sho[0] + int(20 * scale), sho[1] - int(75 * scale))
@@ -651,13 +635,7 @@ def generate_angle_calculated_image(original_bgr: np.ndarray, points: list, dete
     draw = ImageDraw.Draw(overlay)
     
     badge_font = get_font(max(13, int(round(15 * scale))), bold=True)
-    title_font = get_font(max(16, int(round(20 * scale))), bold=True)
     
-    # Title Banner
-    draw_pil_badge(draw, "3. Ergonomic Angle Calculation & Posture Assessment", (int(25 * scale), int(25 * scale)),
-                   title_font, text_color=(255, 255, 255, 255), bg_color=(15, 25, 45, 230),
-                   border_color=(0, 220, 0, 255), padding=int(10 * scale), radius=int(6 * scale))
-                   
     # Draw Angle Badges
     for b_text, b_pos, b_color in badges_to_render:
         draw_pil_badge(draw, b_text, b_pos, badge_font, text_color=(255, 255, 255, 255),
@@ -687,16 +665,6 @@ def generate_multi_panel_figure(orig_bgr: np.ndarray, img_joints: np.ndarray,
     p3 = cv2.resize(img_vectors, (target_w, target_h), interpolation=cv2.INTER_AREA)
     p4 = cv2.resize(img_angles, (target_w, target_h), interpolation=cv2.INTER_AREA)
     
-    # Add panel letter tags: (a), (b), (c), (d)
-    font = cv2.FONT_HERSHEY_DUPLEX
-    for p, label in zip([p1, p2, p3, p4], ["(a) Original High-Resolution Input",
-                                           "(b) Detected Joint Keypoints",
-                                           "(c) Extracted Kinematic Vectors",
-                                           "(d) Posture Angle Calculation & Assessment"]):
-        cv2.rectangle(p, (15, 15), (15 + int(len(label) * 16), 55), (15, 20, 30), -1)
-        cv2.putText(p, label, (25, 45), font, 0.85, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.rectangle(p, (15, 15), (15 + int(len(label) * 16), 55), (0, 200, 255), 1, cv2.LINE_AA)
-        
     top_row = np.hstack([p1, p2])
     bot_row = np.hstack([p3, p4])
     grid = np.vstack([top_row, bot_row])
