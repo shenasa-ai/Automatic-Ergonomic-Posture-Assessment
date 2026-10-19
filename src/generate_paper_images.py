@@ -2,11 +2,12 @@
 Paper Image Generator for Ergonomic Posture Assessment.
 
 This script processes high-resolution input images and generates publication-ready
-diagrams for scientific papers:
-  1. Joint Extracted Image: Detected body keypoints with high-res markers and non-overlapping labels.
+diagrams for scientific papers. NO TEXT is drawn on any generated image:
+  1. Joint Extracted Image: Detected body keypoints with high-res color-coded markers.
   2. Vector Extracted Image: Kinematic skeleton vectors connecting anatomical joints.
-  3. Angle Calculated Image: Posture angles (Knee, Trunk, Neck, Elbow) with geometric arcs,
-     reference axes, numerical degree values, and ROSA ergonomic status badges.
+  3. Angle Calculated Image: Posture angles (Knee, Trunk, Neck, Elbow) shown only with
+     geometric arcs and reference axes (arc color = ergonomic status: green / orange).
+     Numeric angle values are printed to the console instead of the image.
   4. (Optional) Combined Multi-Panel Figure: Composite figure summarizing all steps.
 
 The model used is automatically read from `src/main.py` (deep_model) or can be specified via CLI.
@@ -23,12 +24,13 @@ import argparse
 import re
 import cv2
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 from pose_detector import PoseDetector
 from openpose_detector import OpenPoseDetector
 from mediapipe_pose_detector import MediapipePoseDetector
 from openpifpaf_pose_detector import OpenpifpafPoseDetector
 from rule_provider import RuleProvider
+from face_blurring import FaceBlurring  # adjust the module name if your file is named differently
 
 # Add src to python path for importing detectors
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -129,8 +131,36 @@ def extract_high_res_keypoints(pose_detector, original_bgr: np.ndarray, model_ty
     return high_res_points, names
 
 
+def apply_face_blur(original_bgr: np.ndarray, points: list, model_type: str) -> np.ndarray:
+    """
+    Blurs the face using the project's FaceBlurring class.
+    Works on the original high-resolution image with the high-res keypoints, and returns a
+    new blurred image (the input image is not modified). Falls back to the unblurred image
+    if the face keypoints are missing or blurring fails.
+    """
+    if model_type == "Openpifpaf" or len(points) == 17:
+        nose_idx, l_eye_idx, r_eye_idx, l_ear_idx, r_ear_idx = 0, 1, 2, 3, 4
+    elif model_type == "Mediapipe" or len(points) == 33:
+        nose_idx, l_eye_idx, r_eye_idx, l_ear_idx, r_ear_idx = 0, 2, 5, 7, 8
+    else:
+        nose_idx, l_eye_idx, r_eye_idx, l_ear_idx, r_ear_idx = 0, 1, 2, 3, 4
+
+    if len(points) <= max(nose_idx, l_eye_idx, r_eye_idx, l_ear_idx, r_ear_idx):
+        print("Warning: not enough keypoints for face blurring, skipping.")
+        return original_bgr.copy()
+
+    try:
+        blurrer = FaceBlurring()
+        blurred = blurrer.blur_face(points, nose_idx, l_eye_idx, r_eye_idx,
+                                    l_ear_idx, r_ear_idx, original_bgr)
+        return np.ascontiguousarray(blurred, dtype=np.uint8)
+    except Exception as e:
+        print(f"Warning: face blurring failed ({e}), continuing without blur.")
+        return original_bgr.copy()
+
+
 # ---------------------------------------------------------------------------
-# High-Resolution Rendering & Font Utilities
+# High-Resolution Rendering Utilities
 # ---------------------------------------------------------------------------
 
 def get_drawing_scale(image_shape):
@@ -141,7 +171,7 @@ def get_drawing_scale(image_shape):
 
 def dim_background(img_bgr: np.ndarray, strength: float = 0.6, mode: str = "light") -> np.ndarray:
     """
-    Washes out the person/photo so overlays (joints, vectors, arcs, badges) stand out.
+    Washes out the person/photo so overlays (joints, vectors, arcs) stand out.
     strength: 0.0 = original image, 1.0 = fully blank.
     mode: "light" blends toward white (person looks pale/ghosted),
           "dark" blends toward black.
@@ -152,68 +182,6 @@ def dim_background(img_bgr: np.ndarray, strength: float = 0.6, mode: str = "ligh
     target_value = 0 if mode == "dark" else 255
     target = np.full_like(img_bgr, target_value)
     return cv2.addWeighted(img_bgr, 1.0 - strength, target, strength, 0)
-
-
-def get_font(font_size=18, bold=False):
-    """Loads a crisp TrueType font for clean paper typography."""
-    font_candidates = [
-        "arialbd.ttf" if bold else "arial.ttf",
-        "calibrib.ttf" if bold else "calibri.ttf",
-        "segoeuib.ttf" if bold else "segoeui.ttf",
-        "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
-    ]
-    for candidate in font_candidates:
-        try:
-            return ImageFont.truetype(candidate, int(font_size))
-        except Exception:
-            continue
-    return ImageFont.load_default()
-
-
-def draw_pil_badge(draw, text, pos, font, text_color=(255, 255, 255, 255),
-                   bg_color=(25, 30, 40, 220), border_color=(200, 200, 200, 255),
-                   padding=6, radius=6, img_size=None):
-    """Draws a rounded semi-transparent badge with crisp anti-aliased text and boundary clamping."""
-    bbox = draw.textbbox((0, 0), text, font=font)
-    t_w = bbox[2] - bbox[0]
-    t_h = bbox[3] - bbox[1]
-
-    x, y = pos
-    x1 = x - padding
-    y1 = y - padding
-    x2 = x + t_w + padding
-    y2 = y + t_h + padding
-
-    # Boundary clamping
-    if img_size is not None or hasattr(draw, "_image"):
-        w, h = img_size if img_size else draw._image.size
-        margin = 15
-        if x2 > w - margin:
-            shift = x2 - (w - margin)
-            x -= shift
-            x1 -= shift
-            x2 -= shift
-        if x1 < margin:
-            shift = margin - x1
-            x += shift
-            x1 += shift
-            x2 += shift
-        if y2 > h - margin:
-            shift = y2 - (h - margin)
-            y -= shift
-            y1 -= shift
-            y2 -= shift
-        if y1 < margin:
-            shift = margin - y1
-            y += shift
-            y1 += shift
-            y2 += shift
-
-    # Draw rounded rectangle
-    draw.rounded_rectangle([x1, y1, x2, y2], radius=radius, fill=bg_color, outline=border_color, width=1)
-    # Draw text
-    draw.text((x, y), text, font=font, fill=text_color)
-    return x1, y1, x2, y2
 
 
 def draw_styled_joint(img, pt, color=(0, 255, 255), radius=8, outline_color=(15, 15, 15), outline_thick=2):
@@ -324,25 +292,18 @@ def calculate_angle_vector_axis(v, axis_vector=np.array([0, -1])):
 
 
 # ---------------------------------------------------------------------------
-# Image 1: Joint Extracted Image
+# Image 1: Joint Extracted Image (no text)
 # ---------------------------------------------------------------------------
 
-def generate_joint_extracted_image(original_bgr: np.ndarray, points: list, keypoint_names: dict) -> np.ndarray:
+def generate_joint_extracted_image(original_bgr: np.ndarray, points: list) -> np.ndarray:
     """
     Generates Image 1: Detected body joint points overlaid at original high resolution
-    with distinct anatomical markers, outer rings, and non-overlapping label callouts.
+    with distinct color-coded anatomical markers. No text is drawn.
     """
-    orig_rgb = cv2.cvtColor(original_bgr, cv2.COLOR_BGR2RGB)
-    pil_img = Image.fromarray(orig_rgb).convert("RGBA")
-    overlay = Image.new("RGBA", pil_img.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(overlay)
-
-    scale = get_drawing_scale(original_bgr.shape)
+    img = original_bgr.copy()
+    scale = get_drawing_scale(img.shape)
     radius = max(6, int(round(7.5 * scale)))
     outline_thick = max(1, int(round(2 * scale)))
-    font = get_font(max(12, int(round(14 * scale))), bold=True)
-    title_font = get_font(max(16, int(round(20 * scale))), bold=True)
-    badge_pad = max(3, int(round(4.5 * scale)))
 
     palette_bgr = {
         "head": (255, 240, 0),      # Cyan
@@ -354,87 +315,36 @@ def generate_joint_extracted_image(original_bgr: np.ndarray, points: list, keypo
         "default": (0, 255, 255)    # Yellow
     }
 
-    def get_joint_color_rgba(idx):
-        bgr = palette_bgr["default"]
+    for idx, pt in enumerate(points):
+        if pt is None:
+            continue
+        c_bgr = palette_bgr["default"]
         if idx in [0, 1, 2, 3, 4, 7, 8]:
-            bgr = palette_bgr["head"]
+            c_bgr = palette_bgr["head"]
         elif idx in [5, 7, 9, 11, 13, 15]:
-            bgr = palette_bgr["l_arm"]
+            c_bgr = palette_bgr["l_arm"]
         elif idx in [6, 8, 10, 12, 14, 16]:
-            bgr = palette_bgr["r_arm"]
+            c_bgr = palette_bgr["r_arm"]
         elif idx in [11, 12, 23, 24]:
-            bgr = palette_bgr["torso"]
+            c_bgr = palette_bgr["torso"]
         elif idx in [13, 15, 25, 27]:
-            bgr = palette_bgr["l_leg"]
+            c_bgr = palette_bgr["l_leg"]
         elif idx in [14, 16, 26, 28]:
-            bgr = palette_bgr["r_leg"]
-        return (bgr[2], bgr[1], bgr[0], 255)
+            c_bgr = palette_bgr["r_leg"]
+        draw_styled_joint(img, pt, color=c_bgr, radius=radius, outline_thick=outline_thick)
 
-    # First draw styled joint circles on OpenCV layer
-    bgr_copy = original_bgr.copy()
-    for idx, pt in enumerate(points):
-        if pt is not None:
-            c_bgr = palette_bgr["default"]
-            if idx in [0, 1, 2, 3, 4, 7, 8]:
-                c_bgr = palette_bgr["head"]
-            elif idx in [5, 7, 9, 11, 13, 15]:
-                c_bgr = palette_bgr["l_arm"]
-            elif idx in [6, 8, 10, 12, 14, 16]:
-                c_bgr = palette_bgr["r_arm"]
-            elif idx in [11, 12, 23, 24]:
-                c_bgr = palette_bgr["torso"]
-            elif idx in [13, 15, 25, 27]:
-                c_bgr = palette_bgr["l_leg"]
-            elif idx in [14, 16, 26, 28]:
-                c_bgr = palette_bgr["r_leg"]
-            draw_styled_joint(bgr_copy, pt, color=c_bgr, radius=radius, outline_thick=outline_thick)
-
-    pil_img = Image.fromarray(cv2.cvtColor(bgr_copy, cv2.COLOR_BGR2RGB)).convert("RGBA")
-    draw = ImageDraw.Draw(overlay)
-
-    # Specific non-overlapping offsets for joints in side-view to ensure pristine paper readability
-    offset_dict = {
-        0: (-int(75 * scale), -int(20 * scale)),   # Nose: left
-        1: (-int(60 * scale), -int(40 * scale)),   # L-Eye: up-left
-        3: (int(15 * scale), -int(30 * scale)),    # L-Ear: up-right
-        5: (int(16 * scale), int(14 * scale)),     # L-Shoulder: down-right
-        6: (-int(105 * scale), -int(35 * scale)),  # R-Shoulder: up-left
-        7: (int(16 * scale), int(6 * scale)),      # L-Elbow: right
-        8: (-int(95 * scale), -int(25 * scale)),   # R-Elbow: left
-        9: (int(15 * scale), int(10 * scale)),     # L-Wrist: right
-        10: (-int(95 * scale), -int(20 * scale)),  # R-Wrist: left
-        11: (int(16 * scale), int(10 * scale)),    # L-Hip: right
-        12: (-int(75 * scale), -int(25 * scale)),  # R-Hip: left
-        13: (int(16 * scale), int(10 * scale)),    # L-Knee: right
-        14: (-int(85 * scale), -int(25 * scale)),  # R-Knee: left
-        15: (int(16 * scale), int(8 * scale)),     # L-Ankle: right
-        16: (-int(85 * scale), -int(25 * scale)),  # R-Ankle: left
-    }
-
-    for idx, pt in enumerate(points):
-        if pt is not None:
-            name = keypoint_names.get(idx, f"J{idx}")
-            label_text = f"{idx}: {name}"
-            dx, dy = offset_dict.get(idx, (int(15 * scale), -int(10 * scale)))
-            pos = (pt[0] + dx, pt[1] + dy)
-            border_rgba = get_joint_color_rgba(idx)
-            draw_pil_badge(draw, label_text, pos, font, text_color=(255, 255, 255, 255),
-                           bg_color=(20, 24, 32, 210), border_color=border_rgba,
-                           padding=badge_pad, radius=max(3, int(4 * scale)))
-
-    combined = Image.alpha_composite(pil_img, overlay).convert("RGB")
-    return cv2.cvtColor(np.array(combined), cv2.COLOR_RGB2BGR)
+    return img
 
 
 # ---------------------------------------------------------------------------
-# Image 2: Vector Extracted Image
+# Image 2: Vector Extracted Image (no text)
 # ---------------------------------------------------------------------------
 
-def generate_vector_extracted_image(original_bgr: np.ndarray, points: list, keypoint_names: dict,
+def generate_vector_extracted_image(original_bgr: np.ndarray, points: list,
                                     detector_type: str = "Openpifpaf") -> np.ndarray:
     """
     Generates Image 2: Kinematic skeleton vectors connecting anatomical joints
-    overlaid at original high resolution with directional arrows and segment grouping.
+    overlaid at original high resolution with directional arrows. No text is drawn.
     """
     img = original_bgr.copy()
     scale = get_drawing_scale(img.shape)
@@ -445,48 +355,48 @@ def generate_vector_extracted_image(original_bgr: np.ndarray, points: list, keyp
     if detector_type == "Openpifpaf" or len(points) == 17:
         segments = [
             # Head & Neck
-            {"pair": (0, 1), "color": (255, 220, 0), "name": "Nose-Eye"},
-            {"pair": (1, 3), "color": (255, 220, 0), "name": "Eye-Ear"},
-            {"pair": (3, 5), "color": (0, 230, 255), "name": "Ear-Shoulder (Neck)"},
+            {"pair": (0, 1), "color": (255, 220, 0)},
+            {"pair": (1, 3), "color": (255, 220, 0)},
+            {"pair": (3, 5), "color": (0, 230, 255)},
             # Torso
-            {"pair": (5, 6), "color": (50, 220, 50), "name": "Bi-Shoulder"},
-            {"pair": (5, 11), "color": (0, 255, 128), "name": "L-Trunk"},
-            {"pair": (6, 12), "color": (0, 255, 128), "name": "R-Trunk"},
-            {"pair": (11, 12), "color": (50, 220, 50), "name": "Bi-Pelvis"},
-            # Upper Limbs (Left & Right)
-            {"pair": (5, 7), "color": (0, 165, 255), "name": "L-UpperArm"},
-            {"pair": (7, 9), "color": (0, 140, 255), "name": "L-ForeArm"},
-            {"pair": (6, 8), "color": (0, 215, 255), "name": "R-UpperArm"},
-            {"pair": (8, 10), "color": (0, 195, 255), "name": "R-ForeArm"},
-            # Lower Limbs (Left & Right)
-            {"pair": (11, 13), "color": (220, 60, 220), "name": "L-Thigh"},
-            {"pair": (13, 15), "color": (240, 90, 240), "name": "L-Shank"},
-            {"pair": (12, 14), "color": (255, 170, 0), "name": "R-Thigh"},
-            {"pair": (14, 16), "color": (255, 140, 0), "name": "R-Shank"},
+            {"pair": (5, 6), "color": (50, 220, 50)},
+            {"pair": (5, 11), "color": (0, 255, 128)},
+            {"pair": (6, 12), "color": (0, 255, 128)},
+            {"pair": (11, 12), "color": (50, 220, 50)},
+            # Upper Limbs
+            {"pair": (5, 7), "color": (0, 165, 255)},
+            {"pair": (7, 9), "color": (0, 140, 255)},
+            {"pair": (6, 8), "color": (0, 215, 255)},
+            {"pair": (8, 10), "color": (0, 195, 255)},
+            # Lower Limbs
+            {"pair": (11, 13), "color": (220, 60, 220)},
+            {"pair": (13, 15), "color": (240, 90, 240)},
+            {"pair": (12, 14), "color": (255, 170, 0)},
+            {"pair": (14, 16), "color": (255, 140, 0)},
         ]
     elif detector_type == "Mediapipe" or len(points) == 33:
         segments = [
-            {"pair": (7, 11), "color": (0, 230, 255), "name": "Neck"},
-            {"pair": (11, 12), "color": (50, 220, 50), "name": "Shoulders"},
-            {"pair": (11, 23), "color": (0, 255, 128), "name": "L-Trunk"},
-            {"pair": (12, 24), "color": (0, 255, 128), "name": "R-Trunk"},
-            {"pair": (23, 24), "color": (50, 220, 50), "name": "Pelvis"},
-            {"pair": (11, 13), "color": (0, 165, 255), "name": "L-UpperArm"},
-            {"pair": (13, 15), "color": (0, 140, 255), "name": "L-ForeArm"},
-            {"pair": (12, 14), "color": (0, 215, 255), "name": "R-UpperArm"},
-            {"pair": (14, 16), "color": (0, 195, 255), "name": "R-ForeArm"},
-            {"pair": (23, 25), "color": (220, 60, 220), "name": "L-Thigh"},
-            {"pair": (25, 27), "color": (240, 90, 240), "name": "L-Shank"},
-            {"pair": (24, 26), "color": (255, 170, 0), "name": "R-Thigh"},
-            {"pair": (26, 28), "color": (255, 140, 0), "name": "R-Shank"},
+            {"pair": (7, 11), "color": (0, 230, 255)},
+            {"pair": (11, 12), "color": (50, 220, 50)},
+            {"pair": (11, 23), "color": (0, 255, 128)},
+            {"pair": (12, 24), "color": (0, 255, 128)},
+            {"pair": (23, 24), "color": (50, 220, 50)},
+            {"pair": (11, 13), "color": (0, 165, 255)},
+            {"pair": (13, 15), "color": (0, 140, 255)},
+            {"pair": (12, 14), "color": (0, 215, 255)},
+            {"pair": (14, 16), "color": (0, 195, 255)},
+            {"pair": (23, 25), "color": (220, 60, 220)},
+            {"pair": (25, 27), "color": (240, 90, 240)},
+            {"pair": (24, 26), "color": (255, 170, 0)},
+            {"pair": (26, 28), "color": (255, 140, 0)},
         ]
     else:
         segments = [
-            {"pair": (5, 6), "color": (50, 220, 50), "name": "Torso"},
-            {"pair": (5, 7), "color": (0, 165, 255), "name": "Arm"},
-            {"pair": (7, 9), "color": (0, 165, 255), "name": "Arm"},
-            {"pair": (11, 13), "color": (220, 60, 220), "name": "Leg"},
-            {"pair": (13, 15), "color": (220, 60, 220), "name": "Leg"}
+            {"pair": (5, 6), "color": (50, 220, 50)},
+            {"pair": (5, 7), "color": (0, 165, 255)},
+            {"pair": (7, 9), "color": (0, 165, 255)},
+            {"pair": (11, 13), "color": (220, 60, 220)},
+            {"pair": (13, 15), "color": (220, 60, 220)},
         ]
 
     for seg in segments:
@@ -497,7 +407,7 @@ def generate_vector_extracted_image(original_bgr: np.ndarray, points: list, keyp
                 draw_styled_vector(img, p1, p2, color=seg["color"], thickness=thick,
                                    show_arrow=True, arrow_size=arrow_size)
 
-    for idx, pt in enumerate(points):
+    for pt in points:
         if pt is not None:
             draw_styled_joint(img, pt, color=(240, 240, 240), radius=radius, outline_thick=max(1, thick // 2))
 
@@ -505,14 +415,15 @@ def generate_vector_extracted_image(original_bgr: np.ndarray, points: list, keyp
 
 
 # ---------------------------------------------------------------------------
-# Image 3: Angle Calculated Image
+# Image 3: Angle Calculated Image (no text)
 # ---------------------------------------------------------------------------
 
 def generate_angle_calculated_image(original_bgr: np.ndarray, points: list, detector_type: str = "Openpifpaf",
                                     light_bg: bool = True) -> np.ndarray:
     """
-    Generates Image 3: Calculated ergonomic postural angles (Neck, Trunk, Knee, Elbow)
-    with geometric arcs, reference axes, degree values (°), and ROSA ergonomic status badges.
+    Generates Image 3: Postural angles (Neck, Trunk, Knee, Elbow) shown with geometric arcs
+    and reference axes only. Arc color encodes status (green = optimal, orange = risk).
+    No text is drawn on the image; the numeric values are printed to the console.
     light_bg: True when the background is faded toward white (uses dark skeleton lines for contrast).
     """
     img = original_bgr.copy()
@@ -523,37 +434,21 @@ def generate_angle_calculated_image(original_bgr: np.ndarray, points: list, dete
     arc_radius = max(26, int(round(40 * scale)))
 
     if detector_type == "Openpifpaf" or len(points) == 17:
-        nose = points[0]
-        l_ear = points[3]
-        r_ear = points[4]
-        l_sho = points[5]
-        r_sho = points[6]
-        l_elb = points[7]
-        r_elb = points[8]
-        l_wri = points[9]
-        r_wri = points[10]
-        l_hip = points[11]
-        r_hip = points[12]
-        l_kne = points[13]
-        r_kne = points[14]
-        l_ank = points[15]
-        r_ank = points[16]
+        l_ear, r_ear = points[3], points[4]
+        l_sho, r_sho = points[5], points[6]
+        l_elb, r_elb = points[7], points[8]
+        l_wri, r_wri = points[9], points[10]
+        l_hip, r_hip = points[11], points[12]
+        l_kne, r_kne = points[13], points[14]
+        l_ank, r_ank = points[15], points[16]
     else:
-        nose = points[0]
-        l_ear = points[7]
-        r_ear = points[8]
-        l_sho = points[11]
-        r_sho = points[12]
-        l_elb = points[13]
-        r_elb = points[14]
-        l_wri = points[15]
-        r_wri = points[16]
-        l_hip = points[23]
-        r_hip = points[24]
-        l_kne = points[25]
-        r_kne = points[26]
-        l_ank = points[27]
-        r_ank = points[28]
+        l_ear, r_ear = points[7], points[8]
+        l_sho, r_sho = points[11], points[12]
+        l_elb, r_elb = points[13], points[14]
+        l_wri, r_wri = points[15], points[16]
+        l_hip, r_hip = points[23], points[24]
+        l_kne, r_kne = points[25], points[26]
+        l_ank, r_ank = points[27], points[28]
 
     ear = l_ear if l_ear is not None else r_ear
     sho = l_sho if l_sho is not None else r_sho
@@ -563,108 +458,65 @@ def generate_angle_calculated_image(original_bgr: np.ndarray, points: list, dete
     kne = l_kne if l_kne is not None else r_kne
     ank = l_ank if l_ank is not None else r_ank
 
-    badges_to_render = []
-    summary_items = []
+    OK_COLOR = (0, 220, 0)
+    RISK_COLOR = (0, 100, 255)
+    red_dash = (0, 0, 255)
 
     # 1. Knee Angle (Hip - Knee - Ankle)
     if hip is not None and kne is not None and ank is not None:
         knee_angle = calculate_angle_3pts(hip, kne, ank)
         if knee_angle is not None:
             is_optimal = (85.0 <= knee_angle <= 105.0)
-            status_color_bgr = (0, 220, 0) if is_optimal else (0, 100, 255)
-            status_color_rgba = (0, 220, 0, 255) if is_optimal else (255, 100, 0, 255)
-            status_text = "OPTIMAL" if is_optimal else "RISK"
-
+            color = OK_COLOR if is_optimal else RISK_COLOR
             draw_styled_vector(img, kne, hip, color=ref_line_color, thickness=thick)
             draw_styled_vector(img, kne, ank, color=ref_line_color, thickness=thick)
-            draw_angle_arc(img, kne, hip, ank, radius=arc_radius, color=status_color_bgr, thickness=thick)
+            draw_angle_arc(img, kne, hip, ank, radius=arc_radius, color=color, thickness=thick)
+            print(f"  Knee  angle: {knee_angle:.1f} deg ({'OPTIMAL' if is_optimal else 'RISK'})")
 
-            badge_pos = (kne[0] + int(20 * scale), kne[1] + int(15 * scale))
-            badge_text = f"Knee Angle: {knee_angle:.1f}° ({status_text})"
-            badges_to_render.append((badge_text, badge_pos, status_color_rgba))
-            summary_items.append(("Knee Posture (Hip-Knee-Ankle)", f"{knee_angle:.1f}°", status_text, is_optimal))
-
-    # 2. Trunk Angle (Shoulder - Hip relative to horizontal & vertical)
+    # 2. Trunk Angle (Shoulder - Hip relative to horizontal)
     if sho is not None and hip is not None:
         v_horiz_ref = (hip[0] - int(130 * scale), hip[1])
         trunk_angle = calculate_angle_3pts(sho, hip, v_horiz_ref)
-
         if trunk_angle is not None:
             is_optimal = (90.0 <= trunk_angle <= 112.0)
-            status_color_bgr = (0, 220, 0) if is_optimal else (0, 100, 255)
-            status_color_rgba = (0, 220, 0, 255) if is_optimal else (255, 100, 0, 255)
-            status_text = "OPTIMAL" if is_optimal else "RISK"
-
+            color = OK_COLOR if is_optimal else RISK_COLOR
             draw_styled_vector(img, hip, sho, color=ref_line_color, thickness=thick)
-            draw_dashed_line(img, hip, v_horiz_ref, color=(0, 0, 255), thickness=max(1, thick - 1))
+            draw_dashed_line(img, hip, v_horiz_ref, color=red_dash, thickness=max(1, thick - 1))
             v_vert_ref = (hip[0], hip[1] - int(130 * scale))
-            draw_dashed_line(img, hip, v_vert_ref, color=(0, 0, 255), thickness=max(1, thick - 1))
-            draw_angle_arc(img, hip, sho, v_horiz_ref, radius=arc_radius, color=status_color_bgr, thickness=thick)
-
-            badge_pos = (hip[0] - int(250 * scale), hip[1] - int(30 * scale))
-            badge_text = f"Trunk Angle: {trunk_angle:.1f}° ({status_text})"
-            badges_to_render.append((badge_text, badge_pos, status_color_rgba))
-            summary_items.append(("Trunk Posture (Backrest Angle)", f"{trunk_angle:.1f}°", status_text, is_optimal))
+            draw_dashed_line(img, hip, v_vert_ref, color=red_dash, thickness=max(1, thick - 1))
+            draw_angle_arc(img, hip, sho, v_horiz_ref, radius=arc_radius, color=color, thickness=thick)
+            print(f"  Trunk angle: {trunk_angle:.1f} deg ({'OPTIMAL' if is_optimal else 'RISK'})")
 
     # 3. Neck Angle (Ear - Shoulder vs Upward Vertical)
     if ear is not None and sho is not None:
         v_neck = np.array([ear[0] - sho[0], ear[1] - sho[1]], dtype=float)
         neck_vert_angle = calculate_angle_vector_axis(v_neck, np.array([0, -1]))
         vert_ref_point = (sho[0], sho[1] - int(130 * scale))
-
         if neck_vert_angle is not None:
             is_optimal = (neck_vert_angle <= 22.0)
-            status_color_bgr = (0, 220, 0) if is_optimal else (0, 100, 255)
-            status_color_rgba = (0, 220, 0, 255) if is_optimal else (255, 100, 0, 255)
-            status_text = "OPTIMAL" if is_optimal else "BENT FORWARD"
-
+            color = OK_COLOR if is_optimal else RISK_COLOR
             draw_styled_vector(img, sho, ear, color=ref_line_color, thickness=thick)
-            draw_dashed_line(img, sho, vert_ref_point, color=(0, 0, 255), thickness=max(1, thick - 1))
-            draw_angle_arc(img, sho, ear, vert_ref_point, radius=int(arc_radius * 0.8), color=status_color_bgr, thickness=thick)
+            draw_dashed_line(img, sho, vert_ref_point, color=red_dash, thickness=max(1, thick - 1))
+            draw_angle_arc(img, sho, ear, vert_ref_point, radius=int(arc_radius * 0.8), color=color, thickness=thick)
+            print(f"  Neck  angle: {neck_vert_angle:.1f} deg ({'OPTIMAL' if is_optimal else 'BENT FORWARD'})")
 
-            badge_pos = (sho[0] + int(20 * scale), sho[1] - int(75 * scale))
-            badge_text = f"Neck Flexion: {neck_vert_angle:.1f}° ({status_text})"
-            badges_to_render.append((badge_text, badge_pos, status_color_rgba))
-            summary_items.append(("Neck Flexion (Screen/Monitor)", f"{neck_vert_angle:.1f}°", status_text, is_optimal))
-
-    # 4. Elbow / Arm Angle (Shoulder - Elbow - Wrist)
+    # 4. Elbow Angle (Shoulder - Elbow - Wrist)
     if sho is not None and elb is not None and wri is not None:
         elbow_angle = calculate_angle_3pts(sho, elb, wri)
         if elbow_angle is not None:
             is_optimal = (85.0 <= elbow_angle <= 115.0)
-            status_color_bgr = (0, 220, 0) if is_optimal else (0, 100, 255)
-            status_color_rgba = (0, 220, 0, 255) if is_optimal else (255, 100, 0, 255)
-            status_text = "OPTIMAL" if is_optimal else "RISK"
-
+            color = OK_COLOR if is_optimal else RISK_COLOR
             draw_styled_vector(img, elb, sho, color=ref_line_color, thickness=thick)
             draw_styled_vector(img, elb, wri, color=ref_line_color, thickness=thick)
-            draw_angle_arc(img, elb, sho, wri, radius=int(arc_radius * 0.85), color=status_color_bgr, thickness=thick)
-
-            badge_pos = (elb[0] + int(20 * scale), elb[1] - int(10 * scale))
-            badge_text = f"Elbow Angle: {elbow_angle:.1f}° ({status_text})"
-            badges_to_render.append((badge_text, badge_pos, status_color_rgba))
-            summary_items.append(("Armrest / Elbow Angle", f"{elbow_angle:.1f}°", status_text, is_optimal))
+            draw_angle_arc(img, elb, sho, wri, radius=int(arc_radius * 0.85), color=color, thickness=thick)
+            print(f"  Elbow angle: {elbow_angle:.1f} deg ({'OPTIMAL' if is_optimal else 'RISK'})")
 
     # Draw joint points on top
     for pt in points:
         if pt is not None:
             draw_styled_joint(img, pt, color=(255, 255, 255), radius=radius, outline_thick=max(1, thick // 2))
 
-    # Render typography and badges using PIL for perfect degree symbol and anti-aliased text
-    pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)).convert("RGBA")
-    overlay = Image.new("RGBA", pil_img.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(overlay)
-
-    badge_font = get_font(max(13, int(round(15 * scale))), bold=True)
-
-    # Draw Angle Badges
-    for b_text, b_pos, b_color in badges_to_render:
-        draw_pil_badge(draw, b_text, b_pos, badge_font, text_color=(255, 255, 255, 255),
-                       bg_color=(20, 24, 32, 215), border_color=b_color,
-                       padding=max(4, int(5 * scale)), radius=max(3, int(4 * scale)))
-
-    combined = Image.alpha_composite(pil_img, overlay).convert("RGB")
-    return cv2.cvtColor(np.array(combined), cv2.COLOR_RGB2BGR)
+    return img
 
 
 # ---------------------------------------------------------------------------
@@ -689,8 +541,7 @@ def generate_multi_panel_figure(orig_bgr: np.ndarray, img_joints: np.ndarray,
 
     top_row = np.hstack([p1, p2])
     bot_row = np.hstack([p3, p4])
-    grid = np.vstack([top_row, bot_row])
-    return grid
+    return np.vstack([top_row, bot_row])
 
 
 # ---------------------------------------------------------------------------
@@ -698,10 +549,11 @@ def generate_multi_panel_figure(orig_bgr: np.ndarray, img_joints: np.ndarray,
 # ---------------------------------------------------------------------------
 
 def process_image(input_image_path: str, output_directory: str, model_name: str = None,
-                  save_composite: bool = True, bg_dim: float = 0.6, bg_mode: str = "light"):
+                  save_composite: bool = True, bg_dim: float = 0.6, bg_mode: str = "light",
+                  blur_face: bool = True):
     """
     Executes the full paper diagram generation pipeline on a high-resolution image.
-    Generates and saves the 3 images separately.
+    Generates and saves the images separately (no text on any of them).
 
     bg_dim:  background fade strength, 0.0 (original photo) to 1.0 (blank).
     bg_mode: "light" fades the person toward white (default), "dark" fades toward black.
@@ -727,27 +579,39 @@ def process_image(input_image_path: str, output_directory: str, model_name: str 
     detected_count = sum(1 for p in high_res_points if p is not None)
     print(f"[*] Successfully extracted {detected_count}/{len(high_res_points)} body joints.")
 
+    # Blur the face (detection already ran on the unblurred image, so keypoints stay accurate)
+    if blur_face:
+        orig_bgr = apply_face_blur(orig_bgr, high_res_points, resolved_model)
+        print("[*] Face blurred.")
+
     # Faded background used only for the annotated figures
     bg_bgr = dim_background(orig_bgr, bg_dim, bg_mode)
     print(f"[*] Background fade: strength={bg_dim}, mode={bg_mode}")
 
     base_name = os.path.splitext(os.path.basename(input_image_path))[0]
 
-    # 1. Generate Joint Extracted Image
+    # 0. Save the original image with the blurred face (no annotations, no fading)
+    blurred_out_path = None
+    if blur_face:
+        blurred_out_path = os.path.join(output_directory, f"{base_name}_0_original_blurred.png")
+        cv2.imwrite(blurred_out_path, orig_bgr)
+        print(f"  -> Saved: {blurred_out_path}")
+
+    # 1. Joint Extracted Image
     print("[1/3] Generating 1 - Joint Extracted Image...")
-    img_joints = generate_joint_extracted_image(bg_bgr, high_res_points, keypoint_names)
+    img_joints = generate_joint_extracted_image(bg_bgr, high_res_points)
     joint_out_path = os.path.join(output_directory, f"{base_name}_1_joint_extracted.png")
     cv2.imwrite(joint_out_path, img_joints)
     print(f"  -> Saved: {joint_out_path}")
 
-    # 2. Generate Vector Extracted Image
+    # 2. Vector Extracted Image
     print("[2/3] Generating 2 - Vector Extracted Image...")
-    img_vectors = generate_vector_extracted_image(bg_bgr, high_res_points, keypoint_names, resolved_model)
+    img_vectors = generate_vector_extracted_image(bg_bgr, high_res_points, resolved_model)
     vector_out_path = os.path.join(output_directory, f"{base_name}_2_vector_extracted.png")
     cv2.imwrite(vector_out_path, img_vectors)
     print(f"  -> Saved: {vector_out_path}")
 
-    # 3. Generate Angle Calculated Image
+    # 3. Angle Calculated Image
     print("[3/3] Generating 3 - Angle Calculated Image...")
     img_angles = generate_angle_calculated_image(bg_bgr, high_res_points, resolved_model,
                                                  light_bg=(bg_mode == "light"))
@@ -755,7 +619,7 @@ def process_image(input_image_path: str, output_directory: str, model_name: str 
     cv2.imwrite(angle_out_path, img_angles)
     print(f"  -> Saved: {angle_out_path}")
 
-    # 4. (Optional) Generate Composite 2x2 Multi-Panel Figure
+    # 4. (Optional) Composite 2x2 Multi-Panel Figure
     composite_out_path = None
     if save_composite:
         print("[Bonus] Generating Multi-Panel Composite Paper Diagram...")
@@ -767,6 +631,8 @@ def process_image(input_image_path: str, output_directory: str, model_name: str 
     print("\n=================================================================")
     print("       High-Resolution Paper Diagrams Generated Successfully!    ")
     print("=================================================================")
+    if blurred_out_path:
+        print(f"  0. Original (Blurred Face) : {blurred_out_path}")
     print(f"  1. Joint Extracted Image   : {joint_out_path}")
     print(f"  2. Vector Extracted Image  : {vector_out_path}")
     print(f"  3. Angle Calculated Image  : {angle_out_path}")
@@ -782,7 +648,7 @@ def main():
     default_output = os.path.join(current_dir, "../PaperImages", "output")
     default_model = get_default_model_from_main()
 
-    parser = argparse.ArgumentParser(description="Generate publication-ready ergonomic posture diagrams.")
+    parser = argparse.ArgumentParser(description="Generate publication-ready ergonomic posture diagrams (text-free).")
     parser.add_argument("--input", default=default_input, help="Path to high-resolution input image")
     parser.add_argument("--output", default=default_output, help="Path to output directory")
     parser.add_argument("--model", default=default_model, help=f"Pose model to use (default from main.py: {default_model})")
@@ -791,11 +657,13 @@ def main():
                         help="How much the person/photo is faded, 0-1 (0 = original photo, 1 = blank)")
     parser.add_argument("--bg_mode", choices=["light", "dark"], default="light",
                         help="Fade the person toward white (light) or black (dark)")
+    parser.add_argument("--no_blur", action="store_true", help="Do not blur the face")
 
     args = parser.parse_args()
     process_image(args.input, args.output, args.model,
                   save_composite=not args.no_composite,
-                  bg_dim=args.bg_dim, bg_mode=args.bg_mode)
+                  bg_dim=args.bg_dim, bg_mode=args.bg_mode,
+                  blur_face=not args.no_blur)
 
 
 if __name__ == "__main__":
